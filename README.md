@@ -5,13 +5,13 @@ This a simple ROS animated head that can lip sync TTS messages, display a range 
 
 ![Talking](images/talking2.jpg) ![Angry & Disgusted](images/angry2.jpg) ![Gaze Left & Down](images/gaze2.jpg)
 
-Yet it offers more than the original Homer. It uses a offline (embedded) TTS engine with tunable voice characteristics. It allows degrees of emotion and blending between certain base expressions. Finally, it can reorient the graphical head to indicate a rough gaze direction.
+Yet it offers more than the original Homer. It uses an offline (embedded) TTS engine with tunable voice characteristics. It allows degrees of emotion and blending between certain base expressions. Finally, it can reorient the graphical head to indicate a rough gaze direction.
 
 The code here is for Linux only (no Windows) and has been developed with Ubuntu 18.04 and ROS Melodic.
 
 ## Text-to-Speech
 
-The ROS node subscribes to string "speak" messages. New requests override any speech already in progress. Typical latency from command to start of audio is around 700ms on a Jetson Nano. The node also publishes a boolean "talking" message to indicate when the audio is playing (or stops). Some TTS command examples:
+The ROS node subscribes to string "speak" messages for use with the Festival TTS system. New requests override any speech already in progress. Typical latency from command to start of audio is around 700ms on a Jetson Nano. The node also publishes a boolean "talking" message to indicate when the audio is playing (or stops). Some TTS command examples:
 
     rostopic pub -1 speak std_msgs/String "What's new dude?"
     rostopic pub -1 speak std_msgs/String "The red object is near the tall green thing"
