@@ -1,0 +1,4 @@
+festival:
+  ubuntu: festival soundstretch
+qt4:
+  ubuntu: libqt4-dev qt4-dev-tools

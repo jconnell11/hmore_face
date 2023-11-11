@@ -1,0 +1,15 @@
+face_width  : 800
+face_height : 600
+face_model  : "GiGo"         # Lisa or GiGo
+face_skin   : 0xFFFFFF       # white
+face_iris   : 0xFF00FF       # magenta
+face_stare  : 0x80FF00       # greenish
+face_mark   : 0x000000       # black
+
+voice_freq  : 105            # male fundamental
+voice_infl  : 15             # some inflection
+voice_shift : 100            # adult formants
+voice_slow  : 120            # medium slow
+voice_loud  : -100           # dev 1 full volume
+
+
