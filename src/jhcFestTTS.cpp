@@ -67,6 +67,7 @@ jhcFestTTS::jhcFestTTS ()
   slow  = 120;               // speak more slowly
 
   // state variables
+  in = NULL;
   prepping = 0;
   emitting = 0;
 }
@@ -107,10 +108,22 @@ int jhcFestTTS::Start (int vol, int dev)
   make_prolog();
 
   // clear state
-  in = NULL;
   prepping = 0;
   emitting = 0;
   return 1;
+}
+
+
+//= Reset computing components.
+
+void jhcFestTTS::shutdown ()
+{
+  int rc;
+
+  rc = system("pkill festival");   
+  if (in != NULL)
+    fclose(in);
+  in = NULL;
 }
 
 
@@ -131,19 +144,6 @@ void jhcFestTTS::make_prolog ()
   fprintf(out, "(set! after_synth_hooks (lambda (utt) (begin");
   fprintf(out, " (utt.wave.rescale utt 2.6) (utt.save.segs utt \"/mnt/tts_ram/phonemes.txt\") )))\n");
   fclose(out);
-}
-
-
-//= Reset computing components.
-
-void jhcFestTTS::shutdown ()
-{
-  int rc;
-
-  rc = system("pkill festival");   
-  if (in != NULL)
-    fclose(in);
-  in = NULL;
 }
 
 
@@ -240,6 +240,7 @@ const char *jhcFestTTS::Phoneme (float& secs)
 
   // nothing left
   fclose(in);
+  in = NULL;
   return NULL;
 }
 

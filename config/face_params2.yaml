@@ -1,0 +1,19 @@
+face_width  : 800            # pixels
+face_height : 600
+face_model  : "Lisa"         # Lisa has lashes
+
+face_skin   : 0xFFFF40       # yellowish head
+face_back   : 0x40C0FF       # bluish backdrop
+face_iris   : 0xFF00FF       # magenta eye center
+face_stare  : 0x40FF00       # greenish for stare
+face_brows  : 0x402020       # brown eyebrows
+face_eyes   : 0x400080       # lavender eye outlines
+face_mouth  : 0xFF0000       # red mouth
+
+voice_freq  : 270            # female fundamental
+voice_infl  : 30             # excited inflection
+voice_shift : 130            # adolescent formants
+voice_slow  : 120            # medium slow
+voice_loud  : -70            # device 1 medium volume
+
+

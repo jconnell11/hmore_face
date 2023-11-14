@@ -49,10 +49,8 @@
 //   sudo apt-get install festival soundstretch
 // Note: code works for LINUX ONLY!
 
-class jhcFestTTS : private jhcGenTTS
+class jhcFestTTS : public jhcGenTTS
 {
-friend jhcGenTTS *new_jhcGenTTS ();
-
 // PRIVATE MEMBER VARIABLES
 private:
   char ph[10];
@@ -80,8 +78,8 @@ public:
 // PRIVATE MEMBER FUNCTIONS
 private:
   // creation and initialization
-  void make_prolog ();
   void shutdown ();
+  void make_prolog ();
 
   // background thread functions
   static void *generate (void *tts);
@@ -90,10 +88,10 @@ private:
 };
 
 
-//= Construct instance of derived class using shared library (or DLL).
+//= Construct instance of derived class if using shared library (or DLL).
 // program should call delete on returned object at end 
 
-extern "C" jhcGenTTS *new_jhcGenTTS ()
+extern "C" jhcGenTTS *new_jhcTTS ()
 {
   return new jhcFestTTS;
 }

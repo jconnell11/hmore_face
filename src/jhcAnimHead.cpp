@@ -72,9 +72,12 @@ jhcAnimHead::jhcAnimHead (QWidget *parent) : QWidget(parent)
   // default face appearance (used by init_ogre call at first frame)
   model = "GiGo";            // no eyelashes
   skin  = 0xFFFFFF;          // white
+  back  = 0x000000;          // black
   iris  = 0xFF00FF;          // magenta
   stare = 0x80FF00;          // greenish
-  mark  = 0x000000;          // black
+  brows = 0x000000;          // black
+  eyes  = 0x000000;          // black
+  mouth = 0x000000;          // black
 
   // initialize expression and gaze
   chg_expression(0.0, 0.0);
@@ -111,6 +114,7 @@ void jhcAnimHead::init_ogre ()
   Ogre::Entity *head;
   Ogre::SceneNode *node;
   Ogre::Light *light, *spot;
+  Ogre::ColourValue back_col;
 
   // set up Ogre to render into QWidget window 
   make_root();
@@ -134,7 +138,8 @@ void jhcAnimHead::init_ogre ()
 
   // set up for one viewport covering entire window
   view = win->addViewport(cam);
-  view->setBackgroundColour(Ogre::ColourValue(0, 0, 0));   
+  back_col.setAsARGB(0xFF000000 | back);
+  view->setBackgroundColour(back_col);   
 
   // create spotlight (makes disk look more like sphere)
   spot = scene->createLight("Spot");
@@ -275,20 +280,22 @@ void jhcAnimHead::init_anim ()
 
 void jhcAnimHead::set_materials ()
 {
-  Ogre::ColourValue skin_col, mark_col;
+  Ogre::ColourValue skin_col, brows_col, eyes_col, mouth_col;
 
   // set basic colors using RGB integer specs
-  skin_col.setAsARGB(0xFF000000 | skin);
-  iris_col.setAsARGB(0xFF000000 | iris);
-  alt_col.setAsARGB( 0xFF000000 | stare);
-  mark_col.setAsARGB(0xFF000000 | mark);
+  skin_col.setAsARGB( 0xFF000000 | skin);
+  iris_col.setAsARGB( 0xFF000000 | iris);
+  alt_col.setAsARGB(  0xFF000000 | stare);
+  brows_col.setAsARGB(0xFF000000 | brows);
+  eyes_col.setAsARGB( 0xFF000000 | eyes);
+  mouth_col.setAsARGB(0xFF000000 | mouth);
 
   // assign to various features
   color_item("Head",     skin_col);
   color_item("Iris",     iris_col);    // normal
-  color_item("Mouth",    mark_col);
-  color_item("EyeBrows", mark_col);
-  color_item("Eyes",     mark_col);
+  color_item("EyeBrows", brows_col);
+  color_item("Eyes",     eyes_col);
+  color_item("Mouth",    mouth_col);
 }
 
 
@@ -729,6 +736,8 @@ int jhcAnimHead::viseme_for (const char *ph) const
   char wide[9][5]   = {"ae", "ah", "ay", "eh", "el", "em", "en", "ey", "iy"};
   char narrow[7][5] = {"aa", "ao", "aw", "ow", "oy", "uh", "uw"};
   char close[6][5]  = {"b", "f", "m", "p", "v", "w"};
+  char open[25][5]  = {"ax", "axr", "ch", "d", "dh", "dx", "er", "g", "hh", "hv", "ih", "jh", 
+                       "k", "l", "n", "nx", "ng", "r", "s", "sh", "t", "th", "y", "z", "zh"};
   int i;
 
   if (strcmp(ph, "pau") == 0)
@@ -742,7 +751,11 @@ int jhcAnimHead::viseme_for (const char *ph) const
   for (i = 0; i < 6; i++)
     if (strcmp(ph, close[i]) == 0)
       return M_CLOSE;
-  return M_OPEN;                     
+  for (i = 0; i < 25; i++)
+    if (strcmp(ph, open[i]) == 0)
+      return M_OPEN;
+  ROS_WARN("Unknown phoneme \"%s\"", ph);
+  return M_REST;                     
 }
 
 

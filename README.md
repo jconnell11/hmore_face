@@ -16,25 +16,28 @@ The ROS node subscribes to string "speak" messages for use with the Festival TTS
     rostopic pub -1 speak std_msgs/String "What's new dude?"
     rostopic pub -1 speak std_msgs/String "The red object is near the tall green thing"
 
-To allow for different voices, the fundamental frequency can be set (around 100 for male, 200 for female, 300 for kid). To avoid sounding like a creepy adult imitating a child, the overall vocal tract formants can be raised (like by 130%). And to aid intelligibility, the speech can be slowed down and given more or less inflection (sing-song quality). Some typical YAML parameter values:
+To allow for different voices, the fundamental frequency can be set (around 100 for male, 250 for female, 350 for kid). To avoid sounding like a creepy adult imitating a child, the overall vocal tract formants can be raised (like by 150%). And to aid intelligibility, the speech can be slowed down and given more or less inflection (sing-song quality). Some typical YAML parameter values:
 
-    voice_freq  : 105            # male fundamental
-    voice_shift : 100            # adult formants
-    voice_infl  : 15             # some inflection
+    voice_freq  : 270            # female fundamental
+    voice_infl  : 30             # excited inflection
+    voice_shift : 130            # adolescent formants
     voice_slow  : 120            # medium slow
-    voice_loud  : -100           # device 1 full volume
+    voice_loud  : -70            # device 1 medium volume
 
 ## Basic Appearance
 
 The system was designed to use a dedicated display. The animation always appears against a full screen black backdrop, but its active size can be adjusted. As with the original Homer, the face style, skin color, eye color, and feature colors can be adjusted. Again, these are controlled by the ROS parameter file:
 
-    face_width  : 800
+    face_width  : 800            # pixels
     face_height : 600
-    face_model  : "GiGo"         # Lisa has lashes
-    face_skin   : 0xFFFFFF       # white
-    face_iris   : 0xFF00FF       # magenta
-    face_stare  : 0x40FF00       # greenish
-    face_mark   : 0x000000       # black
+    face_model  : "Lisa"         # Lisa has lashes
+    face_skin   : 0xFFFF40       # yellowish head
+    face_back   : 0x40C0FF       # bluish backdrop
+    face_iris   : 0xFF00FF       # magenta eye center
+    face_stare  : 0x40FF00       # greenish for stare
+    face_brows  : 0x402020       # brown eyebrows
+    face_eyes   : 0x400080       # lavender eye outlines
+    face_mouth  : 0xFF0000       # red mouth
 
 The center of the eye can also be dynamically changed to an alternate color using the boolean "stare" message. This is sometimes useful to indicate that the robot is hearing you.
 

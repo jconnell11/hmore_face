@@ -76,7 +76,7 @@ private:
 public:
   // face parameters
   std::string model;
-  int skin, iris, stare, mark;
+  int skin, back, iris, stare, brows, eyes, mouth;
 
 
 // PUBLIC MEMBER FUNCTIONS

@@ -81,15 +81,18 @@ void jhcFaceNode::init_graphics ()
   // configure face appearance options
   nh2.getParam("face_model", anim->model);
   nh2.getParam("face_skin",  anim->skin);
+  nh2.getParam("face_back",  anim->back);
   nh2.getParam("face_iris",  anim->iris);
   nh2.getParam("face_stare", anim->stare);
-  nh2.getParam("face_mark",  anim->mark);
+  nh2.getParam("face_brows", anim->brows);
+  nh2.getParam("face_eyes",  anim->eyes);
+  nh2.getParam("face_mouth", anim->mouth);
 
-   // build an independent black backdrop window filling whole screen
+  // build an independent black backdrop window filling whole screen
   curtain = new QWidget(fbox, Qt::Window | Qt::FramelessWindowHint);
   curtain->setWindowTitle("Face Backdrop");
   pal = curtain->palette();
-  pal.setColor(QPalette::Window, Qt::black);
+  pal.setColor(QPalette::Window, QColor(0xFF000000 | anim->back));
   curtain->setPalette(pal);
   curtain->setAutoFillBackground(true);
   curtain->setCursor(Qt::BlankCursor);
@@ -110,7 +113,7 @@ void jhcFaceNode::init_speech ()
   int loud;
 
   // create component
-  tts = new_jhcGenTTS();
+  tts = new_jhcTTS();
 
   // voice characteristics
   nh2.getParam("voice_freq",  tts->freq);

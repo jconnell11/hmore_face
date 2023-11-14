@@ -1,10 +1,14 @@
-face_width  : 800
+face_width  : 800            # pixels
 face_height : 600
-face_model  : "GiGo"         # Lisa or GiGo
-face_skin   : 0xFFFFFF       # white
-face_iris   : 0xFF00FF       # magenta
-face_stare  : 0x40FF00       # greenish
-face_mark   : 0x000000       # black
+face_model  : "GiGo"         # no eyelashes
+
+face_skin   : 0xFFFFFF       # white head
+face_back   : 0x000000       # black backdrop
+face_iris   : 0xFF00FF       # magenta eye center
+face_stare  : 0x40FF00       # greenish for stare
+face_brows  : 0x000000       # black eyebrows
+face_eyes   : 0x000000       # black eye outlines
+face_mouth  : 0x000000       # black mouth
 
 voice_freq  : 105            # male fundamental
 voice_infl  : 15             # some inflection

@@ -24,7 +24,6 @@
 
 
 //= Interface to a variety of Text-to-Speech implementations.
-// allows linking with different shared libraries (or DLLs)
 
 class jhcGenTTS
 {
@@ -36,15 +35,9 @@ public:
   int slow;        // stretch phrase
 
 
-// PROTECTED MEMBER FUNCTIONS
-protected:
-  //= Block direct use of interface class constructor.
-  jhcGenTTS () {}                     
-
-
 // PUBLIC MEMBER FUNCTIONS
 public:
-  //= Destructor cleans up files and any allocated items.
+  jhcGenTTS () {}     
   virtual ~jhcGenTTS () {}
 
   //= Configure Text-To-Speech system (blocks).
@@ -81,9 +74,8 @@ public:
 };
 
 
-//= Construct instance of derived class using shared library (or DLL).
+//= Construct instance of derived class if using shared library (or DLL).
 // program should call delete on returned object at end 
 
-extern "C" jhcGenTTS *new_jhcGenTTS ();
-
+extern "C" jhcGenTTS *new_jhcTTS ();
 
