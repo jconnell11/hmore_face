@@ -76,11 +76,13 @@ jhcAnimHead::jhcAnimHead (QWidget *parent) : QWidget(parent)
   stare = 0x80FF00;          // greenish
   mark  = 0x000000;          // black
 
-  // initial gaze direction and emotional state
+  // initialize expression and gaze
+  chg_expression(0.0, 0.0);
   pan0 = 0.0;
   tilt0 = 0.0;
-  SetGaze(0.0, 0.0, 0.0);
-  SetEmotion(0.0, 0.0, 0.0);
+  pan2 = 0.0;
+  tilt2 = 0.0;
+  nsp = 90.0;
 }
 
 
@@ -109,7 +111,6 @@ void jhcAnimHead::init_ogre ()
   Ogre::Entity *head;
   Ogre::SceneNode *node;
   Ogre::Light *light, *spot;
-  float off;
 
   // set up Ogre to render into QWidget window 
   make_root();
@@ -158,7 +159,6 @@ void jhcAnimHead::init_ogre ()
   m_anim = head->getAnimationState(m_name);
   e_anim = head->getAnimationState(e_name);
   init_anim();
-  return;
 }
 
 
@@ -428,7 +428,6 @@ void jhcAnimHead::main_loop ()
   {
     init_ogre();
     setup = 1;
-    show_emotion();          // needed unless default = rest
   }
 
   // check for various overall termination conditions
@@ -574,7 +573,7 @@ void jhcAnimHead::resizeEvent (QResizeEvent *evt)
 
 void jhcAnimHead::SetEmotion (float mag, float dir, float secs)
 {
-  float lag = ((sec > 0.0) ? secs : 0.5);
+  float lag = ((secs > 0.0) ? secs : 0.5);
 
   // clear eyebrow animation 
   e_anim->setLength(lag);
@@ -593,7 +592,7 @@ void jhcAnimHead::SetEmotion (float mag, float dir, float secs)
   eyebrow_mood(e_trk->createVertexPoseKeyFrame(0));
 
   // change expression for new emotion
-  chg_expression();
+  chg_expression(mag, dir);
 
   // add mouth and eyebrow finish frames
   mouth_mood(m_trk->createVertexPoseKeyFrame(lag));
@@ -610,10 +609,10 @@ void jhcAnimHead::SetEmotion (float mag, float dir, float secs)
 //          240 angry  disgust 300
 // </pre>
 
-void jhcAnimHead::chg_expression ()
+void jhcAnimHead::chg_expression (float mag, float dir)
 {
-  int hex = (int)(edir / 60.0);
-  float f = edir / 60.0 - hex, sc = ((emag > 0.0) ? emag : 0.0);
+  int hex = (int)(dir / 60.0);
+  float f = dir / 60.0 - hex, sc = ((mag > 0.0) ? mag : 0.0);
   float w0 = sc * (1.0 - f), w1 = sc * f;
 
   // determine overall degree of emotion
@@ -691,41 +690,35 @@ void jhcAnimHead::shift_gaze ()
 
 
 //= Process input text and phoneme file to create timed lists.
-// needs file "phonemes.txt" containing time stamps and phonemes 
 // resulting animation is queued for playback via standard timer loop
 
-void jhcAnimHead::LipSync ()
+void jhcAnimHead::LipSync (jhcGenTTS *tts)
 {
-  char line[80], ph[10];
   Ogre::VertexPoseKeyFrame *frame;
-  FILE *in;
+  const char *ph;
   float secs;
-  int n;
-
-  // open phoneme timing file from Festival 
-  if ((in = fopen("/mnt/tts_ram/phonemes.txt", "r")) == NULL)
-  {
-    ROS_WARN("Cannot open phonemes.txt file");
-    return;
-  }                 
+  int cnt = 0;           
 
   // clear animation and setup neutral mouth frame at time 0
   t_anim->setTimePosition(0);
   t_trk->removeAllKeyFrames();
-  frame = t_trk->createVertexPoseKeyFrame(0)
+  frame = t_trk->createVertexPoseKeyFrame(0);
   mixin_pose(frame, M_REST, 1.0);
 
-  // parse lines of form: "<secs> 100 <phoneme>"
-  while (fgets(line, 80, in) != NULL)
-    if ((sscanf(line, "%f %d %s", &secs, &n, ph) == 3) && (n == 100))
-    {
-      // make mouth key frame and extend animation time to include it
-      t_anim->setLength(secs);        
-      t_trk->getParent()->setLength(secs);
-      frame = t_trk->createVertexPoseKeyFrame(secs);
-      mixin_pose(frame, viseme_for(ph), rand_rng(0.75, 1.0));
-    }
-  fclose(in);
+  // make mouth key frame for phoneme and extend animation to include it
+  while ((ph = tts->Phoneme(secs)) != NULL)
+  {
+    
+    t_anim->setLength(secs);        
+    t_trk->getParent()->setLength(secs);
+    frame = t_trk->createVertexPoseKeyFrame(secs);
+    mixin_pose(frame, viseme_for(ph), rand_rng(0.75, 1.0));
+    cnt++;
+  }
+
+  // sanity check
+  if (cnt <= 0)
+    ROS_WARN("No phonemes from TTS synthesis");
 }
 
 

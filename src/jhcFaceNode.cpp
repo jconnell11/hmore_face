@@ -109,19 +109,21 @@ void jhcFaceNode::init_speech ()
   ros::NodeHandle nh2("~");
   int loud;
 
+  // create component
+  tts = new_jhcGenTTS();
+
   // voice characteristics
-  nh2.getParam("voice_freq",  tts.freq);
-  nh2.getParam("voice_infl",  tts.infl);
-  nh2.getParam("voice_shift", tts.shift);
-  nh2.getParam("voice_slow",  tts.slow);
+  nh2.getParam("voice_freq",  tts->freq);
+  nh2.getParam("voice_infl",  tts->infl);
+  nh2.getParam("voice_shift", tts->shift);
+  nh2.getParam("voice_slow",  tts->slow);
 
   // start background server
   nh2.param("voice_loud", loud, 0);
   if (loud >= 0)
-    tts.Start(loud, 0);
+    tts->Start(loud, 0);
   else
-    tts.Start(-loud, 1);     // set second audio device
-  tts.split = 1;             // two phase
+    tts->Start(-loud, 1);    // set second audio device
   talk = 0;
 }
 
@@ -130,6 +132,9 @@ void jhcFaceNode::init_speech ()
 
 jhcFaceNode::~jhcFaceNode ()
 {
+  // TTS component
+  delete tts;
+
   // graphics components
   delete curtain;
   delete anim;
@@ -155,10 +160,10 @@ void jhcFaceNode::run ()
   while (ros::ok())
   {
     // see if TTS files have just become available
-    if (tts.Poised() > 0)
+    if (tts->Poised() > 0)
     {
-      anim->LipSync();                 // build then start animation
-      tts.Emit();                      // start playing audio file
+      anim->LipSync(tts);              // build then start animation
+      tts->Emit();                     // start playing audio file
       talk = 1;
       yack.data = true;                // send message
       talk_pub.publish(yack);          // 250ms silence at start
@@ -166,9 +171,8 @@ void jhcFaceNode::run ()
 
     // see if TTS audio has just finished playing
     if (talk > 0)
-      if (tts.Talking() <= 0)
+      if (tts->Talking() <= 0)
       {
-        anim->Finished();              // possibly change mouth
         talk = 0;
         yack.data = false;             // send message
         talk_pub.publish(yack);        
@@ -193,7 +197,7 @@ void jhcFaceNode::run ()
 
 void jhcFaceNode::callbackSpeak (const std_msgs::String::ConstPtr& msg)
 {
-  tts.Say(msg->data.c_str());
+  tts->Say(msg->data.c_str(), 1);      // two phase
 }
 
 

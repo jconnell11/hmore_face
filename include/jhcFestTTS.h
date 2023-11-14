@@ -37,7 +37,10 @@
 
 #pragma once
 
+#include <stdio.h>
 #include <pthread.h>
+
+#include <jhcGenTTS.h>
 
 
 //= Simple interface to Linux Festival Text-To-Speech package.
@@ -46,34 +49,29 @@
 //   sudo apt-get install festival soundstretch
 // Note: code works for LINUX ONLY!
 
-class jhcFestTTS
+class jhcFestTTS : private jhcGenTTS
 {
+friend jhcGenTTS *new_jhcGenTTS ();
+
 // PRIVATE MEMBER VARIABLES
 private:
+  char ph[10];
+  FILE *in;
   pthread_t synth, play;
-  int prepping, emitting;
-
-
-// PUBLIC MEMBER VARIABLES
-public:
-  int freq;        // voice pitch
-  int infl;        // pitch variation
-  int shift;       // formant raising
-  int slow;        // stretch phrase
-  int split;       // two phase processing
+  int hook, prepping, emitting;
 
 
 // PUBLIC MEMBER FUNCTIONS
 public:
   // creation and initialization
-  ~jhcFestTTS ();
   jhcFestTTS ();
+  ~jhcFestTTS ();
   int Start (int vol =0, int dev =1);  
-  void Shutdown ();
 
   // main functions
-  void Say (const char *txt);
+  void Say (const char *txt, int split =0);
   int Poised ();
+  const char *Phoneme (float& secs);
   void Emit ();
   int Talking ();
   int Working ();
@@ -83,10 +81,21 @@ public:
 private:
   // creation and initialization
   void make_prolog ();
+  void shutdown ();
 
   // background thread functions
   static void *generate (void *tts);
   static void *speak (void *dummy);
 
 };
+
+
+//= Construct instance of derived class using shared library (or DLL).
+// program should call delete on returned object at end 
+
+extern "C" jhcGenTTS *new_jhcGenTTS ()
+{
+  return new jhcFestTTS;
+}
+
 

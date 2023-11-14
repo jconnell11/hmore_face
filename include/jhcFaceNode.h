@@ -30,7 +30,7 @@
 #include <geometry_msgs/Point.h>
 
 #include <jhcAnimHead.h>
-#include <jhcFestTTS.h>
+#include <jhcGenTTS.h>
 
 
 //= ROS wrapper for jhcAnimHead graphics class.
@@ -48,7 +48,7 @@ private:
   jhcAnimHead *anim;
 
   // Text-To-Speech component
-  jhcFestTTS tts;
+  jhcGenTTS *tts;
   int talk;
 
   // message publishers

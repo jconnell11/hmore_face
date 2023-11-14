@@ -3,7 +3,7 @@ face_height : 600
 face_model  : "GiGo"         # Lisa or GiGo
 face_skin   : 0xFFFFFF       # white
 face_iris   : 0xFF00FF       # magenta
-face_stare  : 0x80FF00       # greenish
+face_stare  : 0x40FF00       # greenish
 face_mark   : 0x000000       # black
 
 voice_freq  : 105            # male fundamental

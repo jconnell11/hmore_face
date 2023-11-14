@@ -26,9 +26,10 @@
 #include <OgreRenderWindow.h>
 #include <OgreCamera.h>
 #include <std_msgs/String.h>
-
 #include <QtWidgets>
 #include <OgreWindowEventUtilities.h>
+
+#include <jhcGenTTS.h>
 
 
 //= Graphics animation routines for talking robot head.
@@ -88,7 +89,7 @@ public:
   void SetEmotion (float emag =0.0, float edir =0.0, float secs =0.0);
   void Stare (int doit =1);
   void SetGaze (float pan =0.0, float tilt =0.0, float dps =0.0);
-  void LipSync ();
+  void LipSync (jhcGenTTS *tts);
 
 
 public slots:
@@ -123,7 +124,7 @@ private:
   float rand_rng (float lo, float hi) const;
 
   // external hooks
-  void chg_expression ();
+  void chg_expression (float mag, float dir);
   void shift_gaze ();
   int viseme_for (const char *ph) const;
 

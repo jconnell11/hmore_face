@@ -35,11 +35,24 @@
 //                      Creation and Initialization                      //
 ///////////////////////////////////////////////////////////////////////////
 
-//= Default destructor does necessary cleanup.
+//= Destructor cleans up files and any allocated items.
+// remove temporary RAM disk
 
 jhcFestTTS::~jhcFestTTS ()
 {
-  Shutdown();
+  struct stat sb;
+  int rc;
+
+  // stop server and phoneme enumeration
+  shutdown();
+
+  // remove temporary RAM disk
+  if (stat("/mnt/tts_ram", &sb) != 0)
+    return;
+  rc = system("sudo umount /mnt/tts_ram");
+  if (stat("/mnt/tts_ram", &sb) != 0)
+    return;
+  rc = system("sudo rm -r /mnt/tts_ram");
 }
 
 
@@ -52,7 +65,6 @@ jhcFestTTS::jhcFestTTS ()
   infl  = 13;                // moderate singsong
   shift = 100;               // original tract length
   slow  = 120;               // speak more slowly
-  split = 0;                 // single phase
 
   // state variables
   prepping = 0;
@@ -61,7 +73,7 @@ jhcFestTTS::jhcFestTTS ()
 
 
 //= Configure Text-To-Speech system (blocks).
-// can optional set audio device volume percentage (0 = no change)
+// can set volume percentage (0 = no change) for some audio device
 // returns 1 if successful, 0 or negative for problem
 
 int jhcFestTTS::Start (int vol, int dev)
@@ -70,8 +82,8 @@ int jhcFestTTS::Start (int vol, int dev)
   struct stat sb;
   int rc;
 
-  // stop Festival and RAM disk if they already exist
-  Shutdown();
+  // stop Festival and phoneme enumeration if they are running
+  shutdown();
 
   // possibly set pulseaudio output device volume
   if (vol > 0)
@@ -95,6 +107,7 @@ int jhcFestTTS::Start (int vol, int dev)
   make_prolog();
 
   // clear state
+  in = NULL;
   prepping = 0;
   emitting = 0;
   return 1;
@@ -121,20 +134,16 @@ void jhcFestTTS::make_prolog ()
 }
 
 
-//= Cleanly terminate and deallocate all system pieces.
+//= Reset computing components.
 
-void jhcFestTTS::Shutdown ()
+void jhcFestTTS::shutdown ()
 {
-  struct stat sb;
   int rc;
 
-  rc = system("pkill festival");                 // server
-  if (stat("/mnt/tts_ram", &sb) != 0)
-    return;
-  rc = system("sudo umount /mnt/tts_ram");
-  if (stat("/mnt/tts_ram", &sb) != 0)
-    return;
-  rc = system("sudo rm -r /mnt/tts_ram");
+  rc = system("pkill festival");   
+  if (in != NULL)
+    fclose(in);
+  in = NULL;
 }
 
 
@@ -143,11 +152,11 @@ void jhcFestTTS::Shutdown ()
 ///////////////////////////////////////////////////////////////////////////
 
 //= Generate acoustic speech from text input and possibly play it.
-// incurs latency of 300-1400ms depending on text length
 // split 1: poll Poised() then call Emit() then poll Talking() for done
 // split 0: poll Working () for done
+// Note: incurs latency of 300-1400ms depending on text length
 
-void jhcFestTTS::Say (const char *txt)
+void jhcFestTTS::Say (const char *txt, int split)
 {
   FILE *out;
   int rc;
@@ -166,6 +175,7 @@ void jhcFestTTS::Say (const char *txt)
   fclose(out);
 
   // start background thread to generate speech files
+  hook = split;
   prepping = 1;
   pthread_create(&synth, NULL, generate, (void *) this);
 }
@@ -191,12 +201,12 @@ void *jhcFestTTS::generate (void *tts)
 
   // run synthesis command and block until finished (usually less than a second)
   rc = system(cmd);
-  if (me->split <= 0)        
+  if (me->hook <= 0)        
     me->Emit();
 }
 
 
-//= Test if acoustic and auxilliary files have been generated yet.
+//= Test if acoustic and auxilliary outputs have been generated yet.
 // returns 1 if just finished, 0 if still working, -1 if nothing in progress 
 
 int jhcFestTTS::Poised ()
@@ -207,6 +217,30 @@ int jhcFestTTS::Poised ()
     return 0;
   prepping = 0;             
   return 1;                  // just finished - returned only once
+}
+
+
+//= Enumerate phoneme codes and audio start times in order.
+// reset by call to Say(), returns NULL when no more
+
+const char *jhcFestTTS::Phoneme (float& secs)
+{
+  char line[80];
+  int n;
+
+  // make sure phonemes file from Festival is open
+  if (in == NULL)
+    if ((in = fopen("/mnt/tts_ram/phonemes.txt", "r")) == NULL)
+      return NULL;
+
+  // read next entry with valid format (e.g. "1.429 100 zh") 
+  while (fgets(line, 80, in) != NULL)
+    if ((sscanf(line, "%f %d %s", &secs, &n, ph) == 3) && (n == 100))
+      return ph;
+
+  // nothing left
+  fclose(in);
+  return NULL;
 }
 
 

@@ -131,6 +131,7 @@ set(HmoreFace_SRC
 set(HmoreFace_INC
   include/jhcFaceNode.h
   include/jhcFestTTS.h
+  include/jhcGenTTS.h
   include/jhcAnimHead.h
 )
 
