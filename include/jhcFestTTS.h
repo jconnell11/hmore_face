@@ -40,8 +40,6 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#include <jhcGenTTS.h>
-
 
 //= Simple interface to Linux Festival Text-To-Speech package.
 // interacts solely through files and Command Line Interface
@@ -49,7 +47,7 @@
 //   sudo apt-get install festival soundstretch
 // Note: code works for LINUX ONLY!
 
-class jhcFestTTS : public jhcGenTTS
+class jhcFestTTS 
 {
 // PRIVATE MEMBER VARIABLES
 private:
@@ -57,6 +55,14 @@ private:
   FILE *in;
   pthread_t synth, play;
   int hook, prepping, emitting;
+
+
+// PUBLIC MEMBER VARIABLES
+public:
+  int freq;        // voice pitch
+  int infl;        // pitch variation
+  int shift;       // formant raising
+  int slow;        // stretch phrase
 
 
 // PUBLIC MEMBER FUNCTIONS
@@ -87,13 +93,5 @@ private:
 
 };
 
-
-//= Construct instance of derived class if using shared library (or DLL).
-// program should call delete on returned object at end 
-
-extern "C" jhcGenTTS *new_jhcTTS ()
-{
-  return new jhcFestTTS;
-}
 
 

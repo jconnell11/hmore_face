@@ -699,7 +699,7 @@ void jhcAnimHead::shift_gaze ()
 //= Process input text and phoneme file to create timed lists.
 // resulting animation is queued for playback via standard timer loop
 
-void jhcAnimHead::LipSync (jhcGenTTS *tts)
+void jhcAnimHead::LipSync (jhcFestTTS *tts)
 {
   Ogre::VertexPoseKeyFrame *frame;
   const char *ph;

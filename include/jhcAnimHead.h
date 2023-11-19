@@ -29,7 +29,7 @@
 #include <QtWidgets>
 #include <OgreWindowEventUtilities.h>
 
-#include <jhcGenTTS.h>
+#include <jhcFestTTS.h>
 
 
 //= Graphics animation routines for talking robot head.
@@ -89,7 +89,7 @@ public:
   void SetEmotion (float emag =0.0, float edir =0.0, float secs =0.0);
   void Stare (int doit =1);
   void SetGaze (float pan =0.0, float tilt =0.0, float dps =0.0);
-  void LipSync (jhcGenTTS *tts);
+  void LipSync (jhcFestTTS *tts);
 
 
 public slots:

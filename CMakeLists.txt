@@ -131,7 +131,6 @@ set(HmoreFace_SRC
 set(HmoreFace_INC
   include/jhcFaceNode.h
   include/jhcFestTTS.h
-  include/jhcGenTTS.h
   include/jhcAnimHead.h
 )
 
@@ -154,7 +153,6 @@ target_link_libraries(HmoreFace
   ${Qt5X11Extras_LIBRARIES}
   ${OGRE_LIBRARIES}
   pthread
-  tiff
   uuid
 )
 
@@ -164,21 +162,6 @@ install(TARGETS HmoreFace
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY config/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-)
-
-install(DIRECTORY mesh/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/mesh
-)
 
 #############
 ## Testing ##
