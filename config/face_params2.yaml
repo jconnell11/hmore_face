@@ -1,6 +1,6 @@
 face_width  : 800            # pixels
 face_height : 600
-face_model  : "Lisa"         # Lisa has lashes
+face_model  : "GiGo"         # no lashes
 
 face_skin   : 0xFFFF40       # yellowish head
 face_back   : 0x40C0FF       # bluish backdrop
@@ -14,6 +14,7 @@ voice_freq  : 270            # female fundamental
 voice_infl  : 30             # excited inflection
 voice_shift : 130            # adolescent formants
 voice_slow  : 120            # medium slow
-voice_loud  : -70            # device 1 medium volume
+voice_card  : 0              # default output device
+voice_loud  : 60             # medium volume
 
 

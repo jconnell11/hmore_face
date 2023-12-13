@@ -1,6 +1,6 @@
 <launch>
   <!-- Start RobotFace node -->
-  <node name="RobotFace" pkg="hmore_face" type="HmoreFace" cwd="node" respawn="true">
+  <node name="RobotFace" pkg="hmore_face" type="HmoreFace" cwd="node" respawn="false">
     <rosparam file="$(find hmore_face)/config/face_params.yaml" command="load"/>
   </node>
 </launch>

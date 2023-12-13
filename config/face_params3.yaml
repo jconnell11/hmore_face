@@ -1,0 +1,20 @@
+face_width  : 800            # pixels
+face_height : 600
+face_model  : "Lisa"         # eyelashes
+
+face_skin   : 0x8080FF       # lavender head
+face_back   : 0x000000       # black backdrop
+face_iris   : 0x00FFFF       # cyan eye center
+face_stare  : 0x00FF00       # green for stare
+face_brows  : 0x0000FF       # blue eyebrows
+face_eyes   : 0x000000       # black eye outlines
+face_mouth  : 0xFF00FF       # magenta mouth
+
+voice_freq  : 350            # kid fundamental
+voice_infl  : 15             # some inflection
+voice_shift : 100            # adult formants
+voice_slow  : 120            # medium slow
+voice_card  : 3              # audio device 3
+voice_loud  : 80             # high volume
+
+

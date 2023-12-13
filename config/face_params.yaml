@@ -14,6 +14,6 @@ voice_freq  : 105            # male fundamental
 voice_infl  : 15             # some inflection
 voice_shift : 100            # adult formants
 voice_slow  : 120            # medium slow
-voice_loud  : -100           # dev 1 full volume
+voice_loud  : 100            # full volume
 
 

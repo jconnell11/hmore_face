@@ -24,8 +24,7 @@
 //
 //   jhcFestTTS tts;
 //   tts.Start();                      // start server (once)
-//   tts.split = 1;                    // two phase mode (once)
-//   tts.Say("Hello out there!");      // request conversion
+//   tts.Prep("Hello out there!");     // request conversion
 //   while (tts.Poised() == 0)         // await phoneme file
 //     sleep(0.01);
 //   --lip sync--                      // start mouth movement
@@ -39,12 +38,13 @@
 
 #include <stdio.h>
 #include <pthread.h>
+#include <time.h>
 
 
 //= Simple interface to Linux Festival Text-To-Speech package.
 // interacts solely through files and Command Line Interface
 // requires command line libraries:
-//   sudo apt-get install festival soundstretch
+//   sudo apt-get install festival-dev soundstretch
 // Note: code works for LINUX ONLY!
 
 class jhcFestTTS 
@@ -54,7 +54,7 @@ private:
   char ph[10];
   FILE *in;
   pthread_t synth, play;
-  int hook, prepping, emitting;
+  int prepping, emitting;
 
 
 // PUBLIC MEMBER VARIABLES
@@ -68,17 +68,16 @@ public:
 // PUBLIC MEMBER FUNCTIONS
 public:
   // creation and initialization
-  jhcFestTTS ();
   ~jhcFestTTS ();
+  jhcFestTTS ();
   int Start (int vol =0, int dev =1);  
 
   // main functions
-  void Say (const char *txt, int split =0);
+  void Prep (const char *txt);
   int Poised ();
   const char *Phoneme (float& secs);
   void Emit ();
   int Talking ();
-  int Working ();
 
 
 // PRIVATE MEMBER FUNCTIONS

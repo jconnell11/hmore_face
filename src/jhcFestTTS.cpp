@@ -95,14 +95,18 @@ int jhcFestTTS::Start (int vol, int dev)
 
   // make RAM disk for temporary TTS files (1M = 30 secs @ 16K mono 16 bit)
   if (stat("/mnt/tts_ram", &sb) != 0)
+  {
     if (system("sudo mkdir /mnt/tts_ram") != 0)
-      return 0;
-  if (system("sudo mount -t tmpfs -o size=1m tmpfs /mnt/tts_ram") != 0)
-    return 0; 
+      return -2;
+    if (system("sudo mount -t tmpfs -o size=1m tmpfs /mnt/tts_ram") != 0)
+      return -1; 
+  }
 
   // start Festival TTS server (server eats 42MB of RAM with heap = 1M)
-  if (system("festival --server --heap 1000000 &") != 0)  
+  // Note: Scheme environment can be slow to start (hence sleep)
+  if (system("festival --server --heap 1000000 > /dev/null 2>&1 &") != 0)  
     return 0;
+  sleep(1.0);          
 
   // extra instructions for each client call
   make_prolog();
@@ -151,12 +155,11 @@ void jhcFestTTS::make_prolog ()
 //                              Main Functions                           //
 ///////////////////////////////////////////////////////////////////////////
 
-//= Generate acoustic speech from text input and possibly play it.
-// split 1: poll Poised() then call Emit() then poll Talking() for done
-// split 0: poll Working () for done
+//= Generate acoustic speech from text input but don't play it.
+// must poll Poised() then call Emit(), done when Talking() is zero
 // Note: incurs latency of 300-1400ms depending on text length
 
-void jhcFestTTS::Say (const char *txt, int split)
+void jhcFestTTS::Prep (const char *txt)
 {
   FILE *out;
   int rc;
@@ -175,7 +178,6 @@ void jhcFestTTS::Say (const char *txt, int split)
   fclose(out);
 
   // start background thread to generate speech files
-  hook = split;
   prepping = 1;
   pthread_create(&synth, NULL, generate, (void *) this);
 }
@@ -184,7 +186,6 @@ void jhcFestTTS::Say (const char *txt, int split)
 //= Have Festival ingest input files to generate output files (blocks).
 // needs "quip.txt" from Prep and "config.scm" from Start
 // terminates when "speech.wav" and "phonemes.txt" are ready for use
-// can automatically launch Emit() when finished if split <= 0
 
 void *jhcFestTTS::generate (void *tts)
 {
@@ -201,8 +202,7 @@ void *jhcFestTTS::generate (void *tts)
 
   // run synthesis command and block until finished (usually less than a second)
   rc = system(cmd);
-  if (me->hook <= 0)        
-    me->Emit();
+  return NULL;
 }
 
 
@@ -221,7 +221,7 @@ int jhcFestTTS::Poised ()
 
 
 //= Enumerate phoneme codes and audio start times in order.
-// reset by call to Say(), returns NULL when no more
+// reset by call to Prep(), returns NULL when no more
 
 const char *jhcFestTTS::Phoneme (float& secs)
 {
@@ -245,8 +245,9 @@ const char *jhcFestTTS::Phoneme (float& secs)
 }
 
 
-//= Start playing acoustic waveform if in delayed mode.
+//= Start playing already prepared acoustic waveform.
 // poll Done to check when audio output is finished
+// returns start time of audio platback
 
 void jhcFestTTS::Emit ()
 {
@@ -266,17 +267,19 @@ void jhcFestTTS::Emit ()
 
 
 //= Send precomputed wave file to ALSA sound system (blocks).
-// file name change prevents interference with follow-on Say() call
+// file name change prevents interference with follow-on Prep() call
 // audio file usually takes several seconds to finish playing
 
 void *jhcFestTTS::speak (void *dummy)
 {
-  int rc = system("cd /mnt/tts_ram; mv speech.wav output.wav; aplay -q output.wav");
+  int rc;
+
+  rc = system("cd /mnt/tts_ram; mv speech.wav output.wav; aplay -q output.wav");
+  return NULL;
 }
 
 
 //= Test whether something is currently being said (audio playing).
-// equally valid in single phase and two phase settings (= noisy)
 // returns 1 if yacking, 0 if just finished, -1 if nothing in progress
 
 int jhcFestTTS::Talking ()
@@ -288,15 +291,3 @@ int jhcFestTTS::Talking ()
   emitting = 0;              
   return 0;                  // just finished - returned only once
 }
-
-
-//= Test if single phase Say() is fully complete (synthesis and audio finished).
-// returns 1 if still working, 0 if just finished, -1 if nothing in progress
-
-int jhcFestTTS::Working ()
-{
-  if (Poised() == 0)         
-    return 1;                // still in synthesis phase
-  return Talking();
-}
-

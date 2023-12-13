@@ -110,7 +110,7 @@ void jhcFaceNode::init_graphics ()
 void jhcFaceNode::init_speech ()
 {
   ros::NodeHandle nh2("~");
-  int loud;
+  int loud, card;
 
   // voice characteristics
   nh2.getParam("voice_freq",  tts.freq);
@@ -119,11 +119,9 @@ void jhcFaceNode::init_speech ()
   nh2.getParam("voice_slow",  tts.slow);
 
   // start background server
+  nh2.param("voice_card", card, 0);    // default audio = 0
   nh2.param("voice_loud", loud, 0);
-  if (loud >= 0)
-    tts.Start(loud, 0);
-  else
-    tts.Start(-loud, 1);     // set second audio device
+  tts.Start(loud, card);
   talk = 0;
 }
 
@@ -194,7 +192,7 @@ void jhcFaceNode::run ()
 
 void jhcFaceNode::callbackSpeak (const std_msgs::String::ConstPtr& msg)
 {
-  tts.Say(msg->data.c_str(), 1);       // two phase
+  tts.Prep(msg->data.c_str());     
 }
 
 

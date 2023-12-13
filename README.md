@@ -3,7 +3,7 @@
 
 This a simple ROS animated head that can lip sync TTS messages, display a range of expressions, and gaze in various directions. It is based on the old Homer Robot Face from the Universitaet Koblenz-Landau (see [this](https://gitlab.uni-koblenz.de/robbie/homer_robot_face/) and [this](https://github.com/homer-robotics/homer_robot_face)) and uses the same Ogre meshes. 
 
-![Talking](images/talking2.jpg) ![Angry & Disgusted](images/angry2.jpg) ![Gaze Left & Down](images/gaze2.jpg)
+![Talking](images/talking2.jpg) ![Angry & Digusted](images/emo270_2.jpg) ![Gaze Left & Up](images/uplf0_2.jpg)
 
 Yet it offers more than the original Homer. It uses an offline (embedded) TTS engine with tunable voice characteristics. It allows degrees of emotion and blending between certain base expressions. Finally, it can reorient the graphical head to indicate a rough gaze direction.
 
