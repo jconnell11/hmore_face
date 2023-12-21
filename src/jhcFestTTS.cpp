@@ -44,6 +44,8 @@ jhcFestTTS::~jhcFestTTS ()
   int rc;
 
   // stop server and phoneme enumeration
+  kill_emit();
+  kill_prep();
   shutdown();
 
   // remove temporary RAM disk
@@ -74,7 +76,7 @@ jhcFestTTS::jhcFestTTS ()
 
 
 //= Configure Text-To-Speech system (blocks).
-// can set volume percentage (0 = no change) for some audio device
+// can set volume (0 = no change) for some audio card (0 = default)
 // returns 1 if successful, 0 or negative for problem
 
 int jhcFestTTS::Start (int vol, int dev)
@@ -162,14 +164,9 @@ void jhcFestTTS::make_prolog ()
 void jhcFestTTS::Prep (const char *txt)
 {
   FILE *out;
-  int rc;
 
-  // override any other Prep request currently in progress (costs 50ms)
-  if (Poised() == 0)
-  {
-    rc = system("pkill festival-client");
-    pthread_join(synth, NULL);
-  }
+  // terminate any other ongoing request
+  kill_prep();
 
   // move text to speak into a file for the server
   if ((out = fopen("/mnt/tts_ram/quip.txt", "w")) == NULL)
@@ -180,6 +177,19 @@ void jhcFestTTS::Prep (const char *txt)
   // start background thread to generate speech files
   prepping = 1;
   pthread_create(&synth, NULL, generate, (void *) this);
+}
+
+
+//= Override any Prep request currently in progress (costs 50ms).
+
+void jhcFestTTS::kill_prep ()
+{
+  int rc;
+  
+  if (Poised() != 0)
+    return;
+  rc = system("pkill festival-client");
+  pthread_join(synth, NULL);
 }
 
 
@@ -251,18 +261,22 @@ const char *jhcFestTTS::Phoneme (float& secs)
 
 void jhcFestTTS::Emit ()
 {
-  int rc;
-
-  // override any other emit request currently in progress (costs 50ms)
-  if (Talking() > 0)
-  {
-    rc = system("pkill aplay");
-    pthread_join(play, NULL);
-  } 
-
-  // start background thread to play audio file
+  kill_emit();
   emitting = 1;
   pthread_create(&play, NULL, speak, NULL);
+}
+
+
+//= Override any Emit request currently in progress (costs 50ms).
+
+void jhcFestTTS::kill_emit ()
+{
+  int rc;
+
+  if (Talking() <= 0)
+    return;
+  rc = system("pkill aplay");
+  pthread_join(play, NULL);
 }
 
 
