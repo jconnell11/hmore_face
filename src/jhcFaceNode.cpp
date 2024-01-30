@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023 Etaoin Systems
+// Copyright 2023-2024 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -148,10 +148,12 @@ void jhcFaceNode::run ()
 {
   std_msgs::Bool yack;       
 
-  // set up for 20 Hz loop
-  ros::Rate rate(20);
+  // notify other nodes that face is ready by sending "talking=False"
+  yack.data = false;             
+  talk_pub.publish(yack);
 
-  // exit loop if ROS shuts down
+  // run loop at 20 Hz, exit if ROS shuts down
+  ros::Rate rate(20);
   while (ros::ok())
   {
     // see if TTS files have just become available
