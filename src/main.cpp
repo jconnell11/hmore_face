@@ -33,7 +33,7 @@
 
 int main (int argc, char *argv[])
 {
-  const char *name = "RobotFace";
+  const char *name = "hmore_face";
 
   // create application object and animated face 
   QApplication app(argc, argv);

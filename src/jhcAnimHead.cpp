@@ -703,7 +703,7 @@ void jhcAnimHead::LipSync (jhcFestTTS *tts)
 {
   Ogre::VertexPoseKeyFrame *frame;
   const char *ph;
-  float secs;
+  float secs, early = 0.05;            // start mouth shape before sound
   int cnt = 0;           
 
   // clear animation and setup neutral mouth frame at time 0
@@ -715,7 +715,7 @@ void jhcAnimHead::LipSync (jhcFestTTS *tts)
   // make mouth key frame for phoneme and extend animation to include it
   while ((ph = tts->Phoneme(secs)) != NULL)
   {
-    
+    secs -= early;
     t_anim->setLength(secs);        
     t_trk->getParent()->setLength(secs);
     frame = t_trk->createVertexPoseKeyFrame(secs);
@@ -736,6 +736,8 @@ int jhcAnimHead::viseme_for (const char *ph) const
   char wide[9][5]   = {"ae", "ah", "ay", "eh", "el", "em", "en", "ey", "iy"};
   char narrow[7][5] = {"aa", "ao", "aw", "ow", "oy", "uh", "uw"};
   char close[6][5]  = {"b", "f", "m", "p", "v", "w"};
+  char open[25][5]  = {"ax", "axr", "ch", "d", "dh", "dx", "er", "g", "hh", "hv", "ih", "jh", 
+                       "k", "l", "n", "nx", "ng", "r", "s", "sh", "t", "th", "y", "z", "zh"};
   int i;
 
   if (strcmp(ph, "pau") == 0)
@@ -749,7 +751,11 @@ int jhcAnimHead::viseme_for (const char *ph) const
   for (i = 0; i < 6; i++)
     if (strcmp(ph, close[i]) == 0)
       return M_CLOSE;
-  return M_OPEN;                  
+  for (i = 0; i < 25; i++)
+    if (strcmp(ph, open[i]) == 0)
+      return M_OPEN;
+  ROS_WARN("Unknown phoneme \"%s\"", ph);
+  return M_REST;                     
 }
 
 
