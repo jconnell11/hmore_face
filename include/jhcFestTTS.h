@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023 Etaoin Systems
+// Copyright 2023-2024 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@
 //   sudo apt-get install festival-dev soundstretch
 // Note: code works for LINUX ONLY!
 
-class jhcFestTTS
+class jhcFestTTS 
 {
 // PRIVATE MEMBER VARIABLES
 private:
@@ -70,7 +70,7 @@ public:
   // creation and initialization
   ~jhcFestTTS ();
   jhcFestTTS ();
-  int Start (int vol =0, int dev =0);  
+  int Start (int vol =0);  
 
   // main functions
   void Prep (const char *txt);
@@ -87,9 +87,7 @@ private:
   void make_prolog ();
 
   // background thread functions
-  void kill_prep ();
   static void *generate (void *tts);
-  void kill_emit ();
   static void *speak (void *dummy);
 
 };

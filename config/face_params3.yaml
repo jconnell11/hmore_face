@@ -10,11 +10,10 @@ face_brows  : 0x0000FF       # blue eyebrows
 face_eyes   : 0x000000       # black eye outlines
 face_mouth  : 0xFF00FF       # magenta mouth
 
-voice_freq  : 350            # kid fundamental
+voice_freq  : 300            # kid fundamental
 voice_infl  : 15             # some inflection
 voice_shift : 100            # adult formants
 voice_slow  : 120            # medium slow
-voice_card  : 3              # audio device 3
-voice_loud  : 80             # high volume
+voice_loud  : 40             # low volume
 
 

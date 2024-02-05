@@ -120,7 +120,7 @@ catkin_package(
 set(CMAKE_BUILD_TYPE Release)	
 
 # Declare source files
-set(HmoreFace_SRC
+set(hmore_face_SRC
   src/main.cpp
   src/jhcFaceNode.cpp
   src/jhcFestTTS.cpp
@@ -128,25 +128,25 @@ set(HmoreFace_SRC
 )
 
 # Declare header files (needed to specify all include files for wrapping with QT5)
-set(HmoreFace_INC
+set(hmore_face_INC
   include/jhcFaceNode.h
   include/jhcFestTTS.h
   include/jhcAnimHead.h
 )
 
-QT5_WRAP_CPP(HmoreFace_MOC_SRC ${HmoreFace_INC})
+QT5_WRAP_CPP(hmore_face_MOC_SRC ${hmore_face_INC})
 
-add_executable(HmoreFace 
-  ${HmoreFace_SRC} 
-  ${HmoreFace_MOC_SRC}
+add_executable(hmore_face 
+  ${hmore_face_SRC} 
+  ${hmore_face_MOC_SRC}
 )
 
-add_dependencies(HmoreFace 
+add_dependencies(hmore_face 
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(HmoreFace
+target_link_libraries(hmore_face
   ${catkin_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
@@ -156,7 +156,7 @@ target_link_libraries(HmoreFace
   uuid
 )
 
-install(TARGETS HmoreFace
+install(TARGETS hmore_face
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

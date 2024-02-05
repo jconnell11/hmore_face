@@ -20,7 +20,25 @@
 // 
 ///////////////////////////////////////////////////////////////////////////
 
+#include <ros/xmlrpc_manager.h>
+
 #include <jhcFaceNode.h>
+
+
+// signal-safe flag for whether "rosnode kill" is received
+
+sig_atomic_t volatile hmore_kill = 0;
+
+
+//= replacement "shutdown" XMLRPC callback (from "rosnode kill")
+
+void killCallback (XmlRpc::XmlRpcValue& p, XmlRpc::XmlRpcValue& res)
+{
+  if (p.getType() == XmlRpc::XmlRpcValue::TypeArray)
+    if (p.size() > 1)
+      hmore_kill = 1; 
+  res = ros::xmlrpc::responseInt(1, "", 0);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -33,6 +51,10 @@ jhcFaceNode::jhcFaceNode (QApplication *qt)
 {
   // save so can be terminated cleanly
   app = qt;
+
+  // override XMLRPC shutdown
+  ros::XMLRPCManager::instance()->unbind("shutdown");
+  ros::XMLRPCManager::instance()->bind("shutdown", killCallback);
 
   // set up animation and TTS components
   init_graphics();
@@ -110,7 +132,7 @@ void jhcFaceNode::init_graphics ()
 void jhcFaceNode::init_speech ()
 {
   ros::NodeHandle nh2("~");
-  int loud, card;
+  int loud;
 
   // voice characteristics
   nh2.getParam("voice_freq",  tts.freq);
@@ -119,9 +141,8 @@ void jhcFaceNode::init_speech ()
   nh2.getParam("voice_slow",  tts.slow);
 
   // start background server
-  nh2.param("voice_card", card, 0);    // default audio = 0
   nh2.param("voice_loud", loud, 0);
-  tts.Start(loud, card);
+  tts.Start(loud);
   talk = 0;
 }
 
@@ -154,7 +175,7 @@ void jhcFaceNode::run ()
 
   // run loop at 20 Hz, exit if ROS shuts down
   ros::Rate rate(20);
-  while (ros::ok())
+  while (ros::ok() && (hmore_kill <= 0))
   {
     // see if TTS files have just become available
     if (tts.Poised() > 0)

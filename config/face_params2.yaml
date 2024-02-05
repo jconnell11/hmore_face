@@ -14,7 +14,6 @@ voice_freq  : 270            # female fundamental
 voice_infl  : 30             # excited inflection
 voice_shift : 130            # adolescent formants
 voice_slow  : 120            # medium slow
-voice_card  : 0              # default output device
 voice_loud  : 60             # medium volume
 
 

@@ -77,4 +77,4 @@ Right now the face is a flat disk with the features painted on it. Perhaps a bet
 
 ---
 
-January 2024 - Jonathan Connell - jconnell@alum.mit.edu
+February 2024 - Jonathan Connell - jconnell@alum.mit.edu
