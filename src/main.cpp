@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023 Etaoin Systems
+// Copyright 2023-2024 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 
 // holds main application and primary ROS node
 // for lip sync: rostopic pub -1 speak std_msgs/String "What's new dude?"
-// for emotion:  rostopic pub -1 mood std_msgs/String ":-||"
+// for emotion:  rostopic pub -1 mood geometry_msgs/Point 1.0 0.0 5.0
 
 int main (int argc, char *argv[])
 {

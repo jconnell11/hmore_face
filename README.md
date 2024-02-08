@@ -57,7 +57,7 @@ To modulate the face's expression, the node subscribes to point "mood" messages.
                  \    /
      180 sad ---- rest ---- happy 0
                  /    \
-          240 angry  disgust 300
+         240 disgust  angry 300
 
 So 90 degrees specifies a face that is both surprised and afraid. Some more examples:
 
