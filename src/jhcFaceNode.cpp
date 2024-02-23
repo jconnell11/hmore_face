@@ -151,6 +151,9 @@ void jhcFaceNode::init_speech ()
 
 jhcFaceNode::~jhcFaceNode ()
 {
+  // stop Festival
+  tts.Done();
+
   // graphics components
   delete curtain;
   delete anim;
@@ -201,7 +204,8 @@ void jhcFaceNode::run ()
     ros::spinOnce();
   }
 
-  // shutdown QT framework
+  // shutdown Festival and QT framework
+  tts.Done();
   app->exit();    
 }
 

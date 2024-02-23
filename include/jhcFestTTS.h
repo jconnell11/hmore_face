@@ -31,6 +31,7 @@
 //   tts.Emit();                       // start waveform playback
 //   while (tts.Talking() > 0)         // await sound finish (if desired)
 //     sleep(0.01);
+//   tts.Done();
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +48,7 @@
 //   sudo apt-get install festival-dev soundstretch
 // Note: code works for LINUX ONLY!
 
-class jhcFestTTS 
+class jhcFestTTS
 {
 // PRIVATE MEMBER VARIABLES
 private:
@@ -78,6 +79,7 @@ public:
   const char *Phoneme (float& secs);
   void Emit ();
   int Talking ();
+  void Done ();
 
 
 // PRIVATE MEMBER FUNCTIONS
@@ -87,7 +89,9 @@ private:
   void make_prolog ();
 
   // background thread functions
+  void kill_prep ();
   static void *generate (void *tts);
+  void kill_emit ();
   static void *speak (void *dummy);
 
 };

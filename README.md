@@ -5,13 +5,15 @@ This a simple ROS animated head that can lip sync TTS messages, display a range 
 
 ![Talking](images/talking2.jpg) ![Angry & Digusted](images/emo270_2.jpg) ![Gaze Left & Up](images/uplf0_2.jpg)
 
-Yet it offers more than the original Homer. It uses an offline (embedded) TTS engine with tunable voice characteristics. It allows degrees of emotion and blending between certain base expressions. Finally, it can reorient the graphical head to indicate a rough gaze direction.
+Yet it offers more than the original Homer. It uses an offline (embedded) TTS engine with tunable voice characteristics. It allows degrees of emotion and blending between certain base expressions. Finally, it can reorient the graphical head to indicate a rough gaze direction. This [video](https://youtu.be/DcIPQSiz_0I) shows it in operation.
 
 The code here is for Linux only (no Windows) and has been developed with Ubuntu 18.04 and ROS Melodic. It is known to work with Ogre 1.9.0 and Qt 4.8.7 on a Jetson Nano (Cortex A57). To build then start up the system do:
 
     cd your_ws
     catkin_make
     roslaunch hmore_face hmore_face.launch
+
+Some of its capabilities are exercised by [this](scripts/hmore_test.py) Python script.
 
 ## Text-to-Speech
 

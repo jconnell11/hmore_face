@@ -6,8 +6,8 @@ face_skin   : 0x60A060       # light green head
 face_back   : 0x000000       # black backdrop
 face_brows  : 0xA04040       # brown eyebrows
 face_eyes   : 0x000000       # black eye surrounds
-face_iris   : 0x00E0FF       # light blue eye center 
-face_stare  : 0xC0C0FF       # light purple for stare
+face_iris   : 0x00E000       # green eye center 
+face_stare  : 0x00E0FF       # light blue for stare
 face_mouth  : 0xFF00FF       # magenta mouth 
 
 voice_freq  : 105            # kid fundamental
