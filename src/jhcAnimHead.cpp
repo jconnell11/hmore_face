@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023-2024 Etaoin Systems
+// Copyright 2023 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -609,11 +609,11 @@ void jhcAnimHead::SetEmotion (float mag, float dir, float secs)
 
 //= Adjust weights of expression poses based on saved "emag" and "edir".
 // <pre>
-//         120 afraid  surprise 60
+//        120 unhappy  surprised 60
 //                 \    /
-//     180 sad ---- rest ---- happy 0
+//  180 scared ---- rest ---- happy 0
 //                 /    \
-//         240 disgust  angry 300
+//         240 angry   excited 300
 // </pre>
 
 void jhcAnimHead::chg_expression (float mag, float dir)
@@ -628,10 +628,10 @@ void jhcAnimHead::chg_expression (float mag, float dir)
   // mix two nearest expressions by angle
   smile     = ((hex == 0) ? w0 : ((hex == 5) ? w1 : 0.0));
   surprised = ((hex == 1) ? w0 : ((hex == 0) ? w1 : 0.0));
-  afraid    = ((hex == 2) ? w0 : ((hex == 1) ? w1 : 0.0));
-  sad       = ((hex == 3) ? w0 : ((hex == 2) ? w1 : 0.0));
-  disgusted = ((hex == 4) ? w0 : ((hex == 3) ? w1 : 0.0));
-  angry     = ((hex == 5) ? w0 : ((hex == 4) ? w1 : 0.0));  
+  sad       = ((hex == 2) ? w0 : ((hex == 1) ? w1 : 0.0));
+  disgusted = ((hex == 3) ? w0 : ((hex == 2) ? w1 : 0.0));     // looks scared
+  angry     = ((hex == 4) ? w0 : ((hex == 3) ? w1 : 0.0));
+  afraid    = ((hex == 5) ? w0 : ((hex == 4) ? w1 : 0.0));     // big mouth
 }
 
 

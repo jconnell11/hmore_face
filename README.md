@@ -10,7 +10,7 @@ Yet it offers more than the original Homer. It uses an offline (embedded) TTS en
 The code here is for Linux only (no Windows) and has been developed with Ubuntu 18.04 and ROS Melodic. It is known to work with Ogre 1.9.0 and Qt 4.8.7 on a Jetson Nano (Cortex A57). To build then start up the system do:
 
     cd your_ws
-    catkin_make
+    catkin build hmore_face
     roslaunch hmore_face hmore_face.launch
 
 Some of its capabilities are exercised by [this](scripts/hmore_test.py) Python script.
@@ -55,16 +55,16 @@ Like its progenitor, the face also has a number of autonomous behaviors built-in
 
 To modulate the face's expression, the node subscribes to point "mood" messages. These consist of a magnitude for the emotion, an angle giving some blend of expressions, and a transition time. The angles corresponding to the original 6+1 Homer emotions are:
 
-         120 afraid  surprise 60
-                 \    /
-     180 sad ---- rest ---- happy 0
-                 /    \
-         240 disgust  angry 300
+          120 unhappy  surprised 60
+                   \    /
+    180 scared ---- rest ---- happy 0
+                   /    \
+           240 angry   excited 300
 
 So 90 degrees specifies a face that is both surprised and afraid. Some more examples:
 
     rostopic pub -1 mood geometry_msgs/Point 1.0 0.0 5.0      # smile slowly
-    rostopic pub -1 mood geometry_msgs/Point 1.0 270.0 0.0    # angry and disgusted
+    rostopic pub -1 mood geometry_msgs/Point 1.0 210.0 0.0    # angry and scared
     rostopic pub -1 mood geometry_msgs/Point 0.5 60.0 0.01    # slightly surprised quick
 
 ## Gaze
@@ -79,4 +79,4 @@ Right now the face is a flat disk with the features painted on it. Perhaps a bet
 
 ---
 
-February 2024 - Jonathan Connell - jconnell@alum.mit.edu
+April 2024 - Jonathan Connell - jconnell@alum.mit.edu

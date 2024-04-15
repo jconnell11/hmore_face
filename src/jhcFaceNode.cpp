@@ -227,13 +227,13 @@ void jhcFaceNode::callbackSpeak (const std_msgs::String::ConstPtr& msg)
 // takes a point with x = magnitude, y = angle, z = transition time
 // angle is in degrees, magnitude is usually in the 0 to 1 range
 // transition time is in seconds, 0 converted to default of 0.25s
-// example: point(1.0, 240.0, 0.0) -> very disgusted
+// example: point(1.0, 270.0, 0.0) -> angry shouting
 // <pre>
-//         120 afraid  surprise 60
+//        120 unhappy  surprised 60
 //                 \    /
-//     180 sad ---- rest ---- happy 0
+//  180 scared ---- rest ---- happy 0
 //                 /    \
-//         240 disgust  angry 300
+//         240 angry   excited 300
 // </pre>
 
 void jhcFaceNode::callbackMood (const geometry_msgs::Point::ConstPtr& msg)
