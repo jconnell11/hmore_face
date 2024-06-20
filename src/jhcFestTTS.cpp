@@ -86,6 +86,8 @@ int jhcFestTTS::Start (int vol)
   if (stat("/mnt/tts_ram", &sb) != 0)
   {
     if (system("sudo mkdir /mnt/tts_ram") != 0)
+      return -3;
+    if (system("sudo chmod a+w /mnt/tts_ram") != 0)
       return -2;
     if (system("sudo mount -t tmpfs -o size=1m tmpfs /mnt/tts_ram") != 0)
       return -1; 
