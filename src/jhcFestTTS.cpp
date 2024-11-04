@@ -95,7 +95,7 @@ int jhcFestTTS::Start (int vol)
 
   // start Festival TTS server (server eats 42MB of RAM with heap = 1M)
   // Note: Scheme environment can be slow to start (hence sleep)
-  if (system("festival --server --heap 1000000 > /dev/null 2>&1 &") != 0)  
+  if (system("sudo nice -n -20 festival --server --heap 1000000 > /dev/null 2>&1 &") != 0)  
     return 0;
   sleep(1.0);          
 
