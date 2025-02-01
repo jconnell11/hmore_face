@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023-2024 Etaoin Systems
+// Copyright 2023-2025 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ jhcFestTTS::jhcFestTTS ()
   in = NULL;
   prepping = 0;
   emitting = 0;
+  ok = 0;
 }
 
 
@@ -73,7 +74,9 @@ int jhcFestTTS::Start (int vol)
   int rc;
 
   // stop Festival and phoneme enumeration if they are running
-  shutdown();
+  if (ok > 0)
+    shutdown();
+  ok = 0;
 
   // possibly set pulseaudio output device volume
   if (vol > 0)
@@ -101,6 +104,7 @@ int jhcFestTTS::Start (int vol)
 
   // extra instructions for each client call
   make_prolog();
+  ok = 1;
   return 1;
 }
 
@@ -110,10 +114,10 @@ int jhcFestTTS::Start (int vol)
 void jhcFestTTS::shutdown ()
 {
   int rc;
-  
+
   kill_emit();
   kill_prep();
-  rc = system("pkill festival");   
+  rc = system("pkill festival"); 
 }
 
 
@@ -300,6 +304,11 @@ void jhcFestTTS::Done ()
 {
   struct stat sb;
   int rc;
+
+  // skip if already cleaned up
+  if (ok <= 0)
+    return;
+  ok = 0;
 
   // stop current message, phoneme enumeration, and server
   shutdown();

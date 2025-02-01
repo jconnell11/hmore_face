@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023-2024 Etaoin Systems
+// Copyright 2023-2025 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ private:
   char ph[10];
   FILE *in;
   pthread_t synth, play;
-  int prepping, emitting;
+  int ok, prepping, emitting;
 
 
 // PUBLIC MEMBER VARIABLES
