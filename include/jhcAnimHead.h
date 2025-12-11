@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023-2024 Etaoin Systems
+// Copyright 2023-2025 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,15 +25,13 @@
 #include <OgreRoot.h>
 #include <OgreRenderWindow.h>
 #include <OgreCamera.h>
-#include <std_msgs/String.h>
 #include <QtWidgets>
 #include <OgreWindowEventUtilities.h>
-
-#include <jhcFestTTS.h>
 
 
 //= Graphics animation routines for talking robot head.
 // borrows heavily from TalkingHead in Homer Robot Face from Univ. Koblenz-Landau
+// known to work with Qt5
 
 class jhcAnimHead : public QWidget, public Ogre::FrameListener, public Ogre::WindowEventListener
 {
@@ -49,7 +47,11 @@ private:
 
 // PRIVATE MEMBER VARIABLES
 private:
+  // root directory for meshes
+  std::string tools;
+
   // graphics components
+  Ogre::LogManager *logger;
   Ogre::Root *root;
   Ogre::RenderWindow *win;
   Ogre::Camera *cam;
@@ -82,14 +84,16 @@ public:
 // PUBLIC MEMBER FUNCTIONS
 public:
   // creation and initialization
-  jhcAnimHead (QWidget *parent =0);
+  jhcAnimHead (const std::string& mdir, QWidget *parent =0);
   ~jhcAnimHead ();
+  bool Ready () const {return(setup > 0);}
 
   // external hooks
+  void SetMood (int bits =0x0000);
   void SetEmotion (float emag =0.0, float edir =0.0, float secs =0.0);
   void Stare (int doit =1);
   void SetGaze (float pan =0.0, float tilt =0.0, float dps =0.0);
-  void LipSync (jhcFestTTS *tts);
+  void LipSync (const char ph[][10], const float t0[], int n);
 
 
 public slots:
@@ -124,6 +128,7 @@ private:
   float rand_rng (float lo, float hi) const;
 
   // external hooks
+  float mood_expr (float& mag, float& ang, int m) const;
   void chg_expression (float mag, float dir);
   void shift_gaze ();
   int viseme_for (const char *ph) const;

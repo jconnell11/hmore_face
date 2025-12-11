@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023-2024 Etaoin Systems
+// Copyright 2023-2025 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int32.h>
 #include <geometry_msgs/Point.h>
 
 #include <jhcAnimHead.h>
@@ -55,7 +56,7 @@ private:
   ros::Publisher talk_pub;
 
   // message subscribers
-  ros::Subscriber speak_sub, mood_sub, stare_sub, gaze_sub;
+  ros::Subscriber speak_sub, voice_sub, expr_sub, stare_sub, gaze_sub, mood_sub;
 
 
 // PUBLIC MEMBER FUNCTIONS
@@ -76,9 +77,12 @@ private:
 
   // message callbacks
   void callbackSpeak (const std_msgs::String::ConstPtr& msg);
-  void callbackMood (const geometry_msgs::Point::ConstPtr& msg);
+  void callbackVoice (const geometry_msgs::Point::ConstPtr& msg);
+  void callbackExpr (const geometry_msgs::Point::ConstPtr& msg);
   void callbackStare (const std_msgs::Bool::ConstPtr& msg);
   void callbackGaze (const geometry_msgs::Point::ConstPtr& msg);
+  void callbackMood (const std_msgs::Int32::ConstPtr& msg);
+
 
 };
 

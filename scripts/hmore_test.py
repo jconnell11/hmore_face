@@ -9,7 +9,7 @@
 #
 # =========================================================================
 #
-# Copyright 2024 Etaoin Systems
+# Copyright 2024-2025 Etaoin Systems
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class HmoreTest:
     rospy.init_node('hmore_test')
     self.gaze_pub  = rospy.Publisher('gaze',  Point,  queue_size=10)
     self.stare_pub = rospy.Publisher('stare', Bool,   queue_size=10)
-    self.mood_pub  = rospy.Publisher('mood',  Point,  queue_size=10)
+    self.expr_pub  = rospy.Publisher('expr',  Point,  queue_size=10)
     self.speak_pub = rospy.Publisher('speak', String, queue_size=10)
     rospy.sleep(1)           # wait for connections
 
@@ -45,7 +45,7 @@ class HmoreTest:
     
     # reset face and wait a while
     neutral = Point(0.0, 0.0, 0.0)
-    self.mood_pub.publish(neutral)
+    self.expr_pub.publish(neutral)
     green = Bool(False)
     self.stare_pub.publish(green)
     rospy.sleep(10)
@@ -69,7 +69,7 @@ class HmoreTest:
     self.speak_pub.publish(greet)
     rospy.sleep(3)
     happy = Point(1.0, 0.0, 3.0)
-    self.mood_pub.publish(happy)
+    self.expr_pub.publish(happy)
 
 
 # =========================================================================

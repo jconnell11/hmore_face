@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023 Etaoin Systems
+// Copyright 2023-2025 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@
 #include <OgreEntity.h>
 #include <OgreMeshManager.h>
 #include <QX11Info>
-#include <ros/ros.h>
-#include <ros/package.h>
 #include <sys/random.h>
 #include <math.h>
 
@@ -42,28 +40,33 @@
 // a special animation track implements lip sync using a phoneme timing file
 // extra short animation tracks change mouth and eyebrow positions with emotion
 
-jhcAnimHead::jhcAnimHead (QWidget *parent) : QWidget(parent) 
+jhcAnimHead::jhcAnimHead (const std::string& mdir, QWidget *parent) : QWidget(parent) 
 {
+  // remember base directory for meshes
+  tools = mdir;
+
   // mark that Ogre initialization is needed and clear basic items 
   setMinimumSize(100, 100);
   setup = 0;
-  root = 0;
-  win = 0;
-  cam = 0;
+  logger = NULL;
+  root = NULL;
+  win = NULL;
+  cam = NULL;
 
   // set names for new tracks and clear other animation items 
-  all_anim = 0;
+  all_anim = NULL;
   t_name = "mouth talk";
-  t_anim = 0;
-  t_trk = 0;
+  t_anim = NULL;
+  t_trk = NULL;
   m_name = "mouth emote";
-  m_anim = 0;
-  m_trk = 0;
+  m_anim = NULL;
+  m_trk = NULL;
   e_name = "eyebrows emote";
-  e_anim = 0;
-  e_trk = 0;
+  e_anim = NULL;
+  e_trk = NULL;
  
-  // create and configure timer for rendering loop
+  // create, configure, and start timer for rendering loop 
+  // Note: timer fcn main_loop() invokes init_ogre() on first call
   timer = new QTimer(this); 
   connect(timer, SIGNAL(timeout()), SLOT(main_loop()));
   timer->start(50);    
@@ -81,9 +84,9 @@ jhcAnimHead::jhcAnimHead (QWidget *parent) : QWidget(parent)
 
   // initialize expression and gaze
   chg_expression(0.0, 0.0);
-  pan0 = 0.0;
+  pan0  = 0.0;
   tilt0 = 0.0;
-  pan2 = 0.0;
+  pan2  = 0.0;
   tilt2 = 0.0;
   nsp = 90.0;
 }
@@ -97,6 +100,7 @@ jhcAnimHead::~jhcAnimHead ()
   Ogre::WindowEventUtilities::removeWindowEventListener(win, this);
   windowClosed(win);
   delete root;
+  delete logger;
 }
 
 
@@ -105,7 +109,8 @@ jhcAnimHead::~jhcAnimHead ()
 ///////////////////////////////////////////////////////////////////////////
 
 //= Configure majority of graphics components.
-// binds "root", "win" and "cam" member variables
+// binds "logger", "root", "win", and "cam" member variables
+// Note: invoked on first call of timer fcn main_loop()
 
 void jhcAnimHead::init_ogre ()
 {
@@ -171,7 +176,7 @@ void jhcAnimHead::init_ogre ()
 
 void jhcAnimHead::make_root ()
 {
-  std::string prefix, tools;
+  std::string prefix;
   Ogre::RenderSystemList list;
   Ogre::RenderSystem *render = NULL;
   int i, n;
@@ -184,7 +189,9 @@ void jhcAnimHead::make_root ()
   // find and set up rendering engine
   try
   {
-    // basic system shell 
+    // get rid of copious messages then create basic system shell
+    logger = new Ogre::LogManager;
+    logger->createLog("DefaultLog", true, false, false);
     root = new Ogre::Root();
     root->loadPlugin(prefix + "RenderSystem_GL");
 
@@ -209,13 +216,12 @@ void jhcAnimHead::make_root ()
     root->setRenderSystem(render);
     root->initialise(false);
 
-    // provide path to mesh files
-    tools = ros::package::getPath(ROS_PACKAGE_NAME);
+    // provide path to mesh files ("tools" set by constructor)
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(tools + "/mesh", "FileSystem", model);
   }
   catch (const std::exception& e)
   {
-    ROS_WARN("Failed to initialize Ogre: %s\n", e.what());
+//    ROS_WARN("Failed to initialize Ogre: %s\n", e.what());
     throw;
   }
   root->restoreConfig();
@@ -232,7 +238,7 @@ void jhcAnimHead::bind_window ()
   // render into pre-existing window from widget
   hwin = Ogre::StringConverter::toString((unsigned long) QX11Info::display()) + ":"
        + Ogre::StringConverter::toString((unsigned int)  QX11Info::appScreen()) + ":"
-       + Ogre::StringConverter::toString((unsigned long) nativeParentWidget()->effectiveWinId());
+       + Ogre::StringConverter::toString((unsigned long)(nativeParentWidget()->effectiveWinId()));
   vcfg["externalWindowHandle"] = hwin;           // percolates moves & resizes
   vcfg["monitorIndex"] = "2";
   vcfg["FSAA"] = "8";                            // anti-aliasing ON                           
@@ -242,9 +248,6 @@ void jhcAnimHead::bind_window ()
   win->setActive(true);
 
   // allow widget's window to be used
-//  WId id = 0x0;
-//  win->getCustomAttribute("WINDOW", &id);
-//  QWidget::create(id);                           // obsolete? 
   QWidget::create();
   setAttribute(Qt::WA_PaintOnScreen, true);
   setAttribute(Qt::WA_OpaquePaintEvent);
@@ -367,7 +370,7 @@ void jhcAnimHead::augment_mesh ()
     std::string error = "OGRE ERROR: ";
     error.append(__FILE__);
     error.append(err.what());
-    ROS_WARN(error.c_str());
+//    ROS_WARN(error.c_str());
   }
 }
 
@@ -434,14 +437,14 @@ void jhcAnimHead::main_loop ()
   if (setup <= 0)
   {
     init_ogre();
-    setup = 1;
+    setup = 1;                         // also readable via Ready()
   }
 
   // check for various overall termination conditions
   if (!root->renderOneFrame() || win->isClosed())
   {
     root->getRenderSystem()->shutdown();
-    ros::shutdown();
+//    ros::shutdown();
   }
 
   // tell system to render next face frame
@@ -573,10 +576,91 @@ void jhcAnimHead::resizeEvent (QResizeEvent *evt)
 //                            External Hooks                             //
 ///////////////////////////////////////////////////////////////////////////
 
+//= Set expression based on mood bits from ALIA reasoner.
+// [ surprised angry scared happy : unhappy bored lonely tired ]
+// high-order bytes contain "very" bits for corresponding conditions
+
+void jhcAnimHead::SetMood (int bits)
+{
+  float mag, ang, secs;
+  
+  secs = mood_expr(mag, ang, bits);
+  SetEmotion(mag, ang, secs);
+}
+
+
+//= Convert ALIA mood bits to facial emotion magnitude and angle.
+// [ surprised angry scared happy : unhappy bored lonely tired ]
+// high-order bytes contain "very" bits for corresponding conditions
+// checks multiple cases in priority order
+// returns transition time (secs)
+// <pre>
+//        120 unhappy  surprised 60
+//                 \    /
+//  180 scared ---- rest ---- happy 0
+//                 /    \
+//         240 angry   excited 300
+// </pre>
+
+float jhcAnimHead::mood_expr (float& mag, float& ang, int m) const
+{
+  float f0, f1;
+ 
+  // surprised (0x80) is very simple  
+  if ((m & 0x80) != 0) 
+  {
+    ang = 60.0;
+    mag = 1.0;
+    return 0.2;                                  // very fast
+  } 
+
+  // if angry (0x40) mix with scared (0x20)
+  if ((m & 0x40) != 0)         
+  {    
+    f0 = (((m & 0x4000) == 0) ? 0.5 : 1.0);
+    f1 = (((m & 0x20) == 0) ? 0.0 : (((m & 0x2000) == 0) ? 0.5 : 1.0));   
+    ang = (f0 * 240.0 + f1 * 180.0) / (f0 + f1);
+    mag = fmax(f0, f1);
+    return 0.5;                                  // fast
+  }
+
+  // if scared (0x20) mix with unhappy (0x08) 
+  if ((m & 0x20) != 0)
+  {  
+    f0 = (((m & 0x2000) == 0) ? 0.5 : 1.0);
+    f1 = (((m & 0x08) == 0) ? 0.0 : (((m & 0x0800) == 0) ? 0.5 : 1.0));  
+    ang = (f0 * 180.0 + f1 * 120.0) / (f0 + f1);
+    mag = fmax(f0, f1);
+    return 1.0;
+  }
+
+  // happy (0x10) is simple
+  if ((m & 0x10) != 0)
+  {                    
+    ang = 0.0;
+    mag = (((m & 0x1000) == 0) ? 0.5 : 1.0);
+    return 1.0;
+  }
+
+  // unhappy (0x08) is simple
+  if ((m & 0x08) != 0)
+  {                    
+    ang = 120.0;
+    mag = (((m & 0x0800) == 0) ? 0.5 : 1.0);
+    return 1.0;
+  }
+
+  // default to neutral (angle irrelevant)
+  ang = 0.0;
+  mag = 0.0;
+  return 2.0;                                    // slow
+}
+
+
 //= Set expression mixing weights based on polar coordinate emotion vector.
 // takes "secs" to change face from current expression to new one over 
 // zero or negative value invokes default of 0.5 seconds
-// morphing from current expresion to new one handled by Ogre animation
+// morphing from current expression to new one handled by Ogre animation
 
 void jhcAnimHead::SetEmotion (float mag, float dir, float secs)
 {
@@ -696,15 +780,14 @@ void jhcAnimHead::shift_gaze ()
 }
 
 
-//= Process input text and phoneme file to create timed lists.
+//= Process array of phoneme start times to get sequence of lip shapes.
 // resulting animation is queued for playback via standard timer loop
 
-void jhcAnimHead::LipSync (jhcFestTTS *tts)
+void jhcAnimHead::LipSync (const char ph[][10], const float t0[], int n)
 {
   Ogre::VertexPoseKeyFrame *frame;
-  const char *ph;
-  float secs, early = 0.05;            // start mouth shape before sound
-  int cnt = 0;           
+  float secs, early = 0.05;               // start mouth shape before sound
+  int i;           
 
   // clear animation and setup neutral mouth frame at time 0
   t_anim->setTimePosition(0);
@@ -713,19 +796,18 @@ void jhcAnimHead::LipSync (jhcFestTTS *tts)
   mixin_pose(frame, M_REST, 1.0);
 
   // make mouth key frame for phoneme and extend animation to include it
-  while ((ph = tts->Phoneme(secs)) != NULL)
+  for (i = 0; i < n; i++)
   {
-    secs -= early;
+    secs = t0[i] - early;
     t_anim->setLength(secs);        
     t_trk->getParent()->setLength(secs);
     frame = t_trk->createVertexPoseKeyFrame(secs);
-    mixin_pose(frame, viseme_for(ph), rand_rng(0.75, 1.0));
-    cnt++;
+    mixin_pose(frame, viseme_for(ph[i]), rand_rng(0.75, 1.0));
   }
 
   // sanity check
-  if (cnt <= 0)
-    ROS_WARN("No phonemes from TTS synthesis");
+//  if (n <= 0)
+//    ROS_WARN("No phonemes from TTS synthesis");
 }
 
 
@@ -754,7 +836,7 @@ int jhcAnimHead::viseme_for (const char *ph) const
   for (i = 0; i < 25; i++)
     if (strcmp(ph, open[i]) == 0)
       return M_OPEN;
-  ROS_WARN("Unknown phoneme \"%s\"", ph);
+//  ROS_WARN("Unknown phoneme \"%s\"", ph);
   return M_REST;                     
 }
 

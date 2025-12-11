@@ -14,6 +14,7 @@ voice_freq  : 300            # kid fundamental
 voice_infl  : 15             # some inflection
 voice_shift : 100            # adult formants
 voice_slow  : 120            # medium slow
+voice_drama : 100            # normal excitability
 voice_loud  : 40             # low volume
 
 

@@ -37,7 +37,6 @@
 
 #pragma once
 
-#include <stdio.h>
 #include <pthread.h>
 #include <time.h>
 
@@ -46,24 +45,38 @@
 // interacts solely through files and Command Line Interface
 // requires command line libraries:
 //   sudo apt-get install festival-dev soundstretch
-// Note: code works for LINUX ONLY!
+// Note: code requires Festival so works for LINUX ONLY!
 
 class jhcFestTTS
 {
 // PRIVATE MEMBER VARIABLES
 private:
-  char ph[10];
-  FILE *in;
+  static const int pmax = 200;         /* Max phonemes per utterance. */
+
+  // background threads
   pthread_t synth, play;
   int ok, prepping, emitting;
 
+  // mouth shape
+  timespec t0;
+
+  // prosody
+  float fmult, imult, rmult;  
+  
 
 // PUBLIC MEMBER VARIABLES
 public:
-  int freq;        // voice pitch
-  int infl;        // pitch variation
+  int freq;        // base voice pitch
+  int infl;        // base pitch variation
+  int slow;        // base phrase stretch
   int shift;       // formant raising
-  int slow;        // stretch phrase
+  int drama;       // emotional modulation
+  int loud;        // audio volume
+
+  // phoneme sequence
+  char ph[pmax][10];   
+  float off[pmax];
+  int np;
 
 
 // PUBLIC MEMBER FUNCTIONS
@@ -71,26 +84,34 @@ public:
   // creation and initialization
   ~jhcFestTTS ();
   jhcFestTTS ();
-  int Start (int vol =0);  
+  bool Active () const {return(ok > 0);}  
+
+  // modulation adjustment
+  void Mood (int bits =0x0000);
+  void Emotion (int feel =5, int very =0);
+  void Prosody (int fpc, int ipc, int rpc);
 
   // main functions
+  int Start (const char *dir =NULL);
   void Prep (const char *txt);
   int Poised ();
-  const char *Phoneme (float& secs);
   void Emit ();
   int Talking ();
+  int Mouth ();
   void Done ();
 
 
 // PRIVATE MEMBER FUNCTIONS
 private:
-  // creation and initialization
+  // main functions
   void shutdown ();
-  void make_prolog ();
+  int load_voice (const char *base);
 
   // background thread functions
   void kill_prep ();
   static void *generate (void *tts);
+  void make_prolog ();
+  void get_phonemes ();
   void kill_emit ();
   static void *speak (void *dummy);
 

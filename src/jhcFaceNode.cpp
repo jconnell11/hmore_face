@@ -4,7 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2023-2024 Etaoin Systems
+// Copyright 2023-2025 Etaoin Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include <ros/xmlrpc_manager.h>
+#include <ros/package.h>
 
 #include <jhcFaceNode.h>
 
@@ -45,7 +46,7 @@ void killCallback (XmlRpc::XmlRpcValue& p, XmlRpc::XmlRpcValue& res)
 //                      Creation and Initialization                      //
 ///////////////////////////////////////////////////////////////////////////
 
-//= Make ROS node that responds to topics "speak", "mood", and "gaze".
+//= Make ROS node that responds to topics "speak", "expr", and "gaze".
 
 jhcFaceNode::jhcFaceNode (QApplication *qt) 
 {
@@ -65,9 +66,11 @@ jhcFaceNode::jhcFaceNode (QApplication *qt)
 
   // install message callbacks
   speak_sub = nh.subscribe<std_msgs::String>("speak", 10, &jhcFaceNode::callbackSpeak, this);
-  mood_sub = nh.subscribe<geometry_msgs::Point>("mood", 10, &jhcFaceNode::callbackMood, this);
+  voice_sub = nh.subscribe<geometry_msgs::Point>("voice", 10, &jhcFaceNode::callbackVoice, this);
+  expr_sub  = nh.subscribe<geometry_msgs::Point>("expr", 10, &jhcFaceNode::callbackExpr, this);
   stare_sub = nh.subscribe<std_msgs::Bool>("stare", 10, &jhcFaceNode::callbackStare, this);
-  gaze_sub = nh.subscribe<geometry_msgs::Point>("gaze", 10, &jhcFaceNode::callbackGaze, this);
+  gaze_sub  = nh.subscribe<geometry_msgs::Point>("gaze", 10, &jhcFaceNode::callbackGaze, this);
+  mood_sub  = nh.subscribe<std_msgs::Int32>("mood", 10, &jhcFaceNode::callbackMood, this);
 }
 
 
@@ -97,7 +100,7 @@ void jhcFaceNode::init_graphics ()
   fbox->move((scr.width() - head_w) / 2, (scr.height() - head_h) / 2);
 
   // create animated face component (stretch face to fit face box)
-  anim = new jhcAnimHead(fbox);
+  anim = new jhcAnimHead(ros::package::getPath(ROS_PACKAGE_NAME), fbox);
   anim->setFixedSize(head_w, head_h); 
 
   // configure face appearance options
@@ -139,10 +142,11 @@ void jhcFaceNode::init_speech ()
   nh2.getParam("voice_infl",  tts.infl);
   nh2.getParam("voice_shift", tts.shift);
   nh2.getParam("voice_slow",  tts.slow);
+  nh2.getParam("voice_drama", tts.drama);
+  nh2.getParam("voice_loud",  tts.loud);
 
-  // start background server
-  nh2.param("voice_loud", loud, 0);
-  tts.Start(loud);
+  // start background TTS server
+  tts.Start();
   talk = 0;
 }
 
@@ -162,7 +166,7 @@ jhcFaceNode::~jhcFaceNode ()
 
 
 ///////////////////////////////////////////////////////////////////////////
-//                            Main Polling Loop                         //
+//                            Main Polling Loop                          //
 ///////////////////////////////////////////////////////////////////////////
 
 //= Periodically check whether activities started by callbacks have finished yet.
@@ -183,10 +187,11 @@ void jhcFaceNode::run ()
     // see if TTS files have just become available
     if (tts.Poised() > 0)
     {
-      anim->LipSync(&tts);             // build then start animation
-      tts.Emit();                      // start playing audio file
+      // build animation then start it along with playing audio file
+      anim->LipSync(tts.ph, tts.off, tts.np);            
+      tts.Emit();                      
       talk = 1;
-      yack.data = true;                // send message
+      yack.data = true;                // send message (audio started)
       talk_pub.publish(yack);          // 250ms silence at start
     }
 
@@ -195,7 +200,7 @@ void jhcFaceNode::run ()
       if (tts.Talking() <= 0)
       {
         talk = 0;
-        yack.data = false;             // send message
+        yack.data = false;             // send message (audio ended)
         talk_pub.publish(yack);        
       }
 
@@ -223,6 +228,16 @@ void jhcFaceNode::callbackSpeak (const std_msgs::String::ConstPtr& msg)
 }
 
 
+//= Change the voice qualities based on some mood.
+// takes a point with x = feeling, y = "very" (z ignored)
+// feeling: 0 bored, 1 happy, 2 sad, 3 angry, 4 scared, 5 excited
+
+void jhcFaceNode::callbackVoice (const geometry_msgs::Point::ConstPtr& msg)
+{
+  tts.Emotion((int)(msg->x + 0.5), (int)(msg->y + 0.5));
+}
+
+
 //= Change the facial expression based to reflect some mood.
 // takes a point with x = magnitude, y = angle, z = transition time
 // angle is in degrees, magnitude is usually in the 0 to 1 range
@@ -236,7 +251,7 @@ void jhcFaceNode::callbackSpeak (const std_msgs::String::ConstPtr& msg)
 //         240 angry   excited 300
 // </pre>
 
-void jhcFaceNode::callbackMood (const geometry_msgs::Point::ConstPtr& msg)
+void jhcFaceNode::callbackExpr (const geometry_msgs::Point::ConstPtr& msg)
 {
   anim->SetEmotion(msg->x, msg->y, msg->z);
 }
@@ -262,4 +277,14 @@ void jhcFaceNode::callbackGaze (const geometry_msgs::Point::ConstPtr& msg)
 }
 
 
+//= Change both the expression and voice characteristics based on mood bits.
+// [ surprised angry scared happy : unhappy bored lonely tired ]
+// high-order bytes contain "very" bits for corresponding conditions
+// examples: scared = 0x0020, bored + tired = 0x0005, very angry = 0x4040
+
+void jhcFaceNode::callbackMood (const std_msgs::Int32::ConstPtr& msg)
+{
+  tts.Mood(msg->data); 
+  anim->SetMood(msg->data); 
+}
 
