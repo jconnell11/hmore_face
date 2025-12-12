@@ -1,5 +1,6 @@
-face_width  : 800            # pixels
+face_width  : 800            # pixel dimensions
 face_height : 600
+face_xshift : 0              # centered in screen
 face_model  : "GiGo"         # no lashes
 
 face_skin   : 0xFFFF40       # yellowish head

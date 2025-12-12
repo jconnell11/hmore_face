@@ -15,7 +15,7 @@ The code here is for Linux only (no Windows) and has been developed with Ubuntu 
     catkin build hmore_face
     roslaunch hmore_face hmore_face.launch
 
-Some of its capabilities are exercised by this sample [__Python script__](scripts/hmore_test.py).
+Some of its capabilities are exercised by this sample [__Python script__](scripts/hmore_test.py) (see starting instructions at bottom of file).
 
 ## Text-to-Speech
 

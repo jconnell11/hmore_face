@@ -1,5 +1,6 @@
-face_width  : 800            # pixels
+face_width  : 800            # pixel dimensions
 face_height : 600
+face_xshift : 0              # centered in screen
 face_model  : "Lisa"         # eyelashes
 
 face_skin   : 0x8080FF       # lavender head

@@ -76,7 +76,7 @@ class HmoreTest:
 
 # send face commands then exit
 # first start face: roslaunch hmore_face hmore_face.launch
-# then run via SSH: rosrun hmore_test hmore_test.py 
+# then run via SSH: rosrun hmore_face hmore_test.py 
 if __name__ == '__main__':
   node = HmoreTest()
   node.Demo()

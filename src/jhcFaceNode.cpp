@@ -82,11 +82,12 @@ void jhcFaceNode::init_graphics ()
   ros::NodeHandle nh2("~");
   QRect scr = QGuiApplication::primaryScreen()->geometry();
   QPalette pal;
-  int head_w, head_h;
+  int head_w, head_h, head_dx;
 
   // read desired head size (pixels)
-  nh2.param("face_width",  head_w, 800);
-  nh2.param("face_height", head_h, 600);
+  nh2.param("face_width",  head_w,  800);
+  nh2.param("face_height", head_h,  600);
+  nh2.param("face_xshift", head_dx, 0);
 
   // build centered black area for inserting robot face
   fbox = new QWidget(0, Qt::FramelessWindowHint);
@@ -97,7 +98,7 @@ void jhcFaceNode::init_graphics ()
   fbox->setAutoFillBackground(true);
   fbox->setCursor(Qt::BlankCursor);
   fbox->setFixedSize(head_w, head_h);      
-  fbox->move((scr.width() - head_w) / 2, (scr.height() - head_h) / 2);
+  fbox->move((scr.width() - head_w) / 2 + head_dx, (scr.height() - head_h) / 2);
 
   // create animated face component (stretch face to fit face box)
   anim = new jhcAnimHead(ros::package::getPath(ROS_PACKAGE_NAME), fbox);
