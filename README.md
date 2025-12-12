@@ -36,8 +36,9 @@ To allow for different voices, the fundamental frequency can be set (around 100 
 
 The system was designed to use a dedicated display. The animation always appears against a full screen black backdrop, but its active size can be adjusted. As with the original Homer, the face style, skin color, eye color, and feature colors can be adjusted. Again, these are controlled by the ROS parameter file [hmore_face.yaml](config/hmore_face.yaml):
 
-    face_width  : 800            # pixels
+    face_width  : 800            # pixel dimensions
     face_height : 600
+    face_xshift : 0              # centered in screen
     face_model  : "Lisa"         # Lisa has lashes
     face_skin   : 0xFFFF40       # yellowish head
     face_back   : 0x40C0FF       # bluish backdrop
