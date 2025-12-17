@@ -100,9 +100,7 @@ With "mood" messages you are limited to just these 8 factors, as opposed to the 
 
 ## Non-ROS Library
 
-The code in this repository is all for creating a ROS node. However, you can also compile the system as a simple __static library__ using the [mpi_face](https://github.com/jconnell11/Ganbei/tree/main/mpi_face) section under the [Ganbei](https://github.com/jconnell11/Ganbei) robot. All the basic messages described here are available as simple functions calls (see [mpi_face.cpp](https://github.com/jconnell11/Ganbei/blob/main/mpi_face/src/mpi_face.cpp)). There is also a Python stub file [mpi_face.py](https://github.com/jconnell11/Ganbei/blob/main/mpi_face/mpi_face.py). Note that this code needs to be able to find the contents of the "mesh" subdirectory via the Start() function.
-
-Also included is the [mpi_spout](https://github.com/jconnell11/Ganbei/blob/main/mpi_face/src/mpi_spout.cpp) library with __TTS only__ (no face) functionality if you just like the funky voice.
+The code in the main repository is all for creating a ROS node. However, you can also compile the system as a simple __static library__ with the [mpi_face](mpi_face) subdirectory. All the basic messages described here are available as simple functions calls (see [mpi_face.cpp](mpi_face/src/mpi_face.cpp)). There is also a Python stub file [mpi_face.py](mpi_face/mpi_face.py) for integration or testing. Note that this code needs to be able to find the contents of the "mesh" subdirectory via the Start() function. And, if you just like the funky voice, there is the [mpi_spout](mpi_face/src/mpi_spout.cpp) library with __TTS only__ (no face) functionality.
 
 ---
 
