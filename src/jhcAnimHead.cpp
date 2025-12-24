@@ -191,7 +191,7 @@ void jhcAnimHead::make_root ()
   {
     // get rid of copious messages then create basic system shell
     logger = new Ogre::LogManager;
-    logger->createLog("DefaultLog", true, false, false);
+    logger->createLog("Ogre_graphics.log", true, false, true);
     root = new Ogre::Root();
     root->loadPlugin(prefix + "RenderSystem_GL");
 
