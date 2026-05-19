@@ -183,7 +183,7 @@ void jhcFaceNode::run ()
 
   // run loop at 20 Hz, exit if ROS shuts down
   ros::Rate rate(20);
-  while (ros::ok() && (hmore_kill <= 0))
+  while (ros::ok() && !ros::isShuttingDown() && (hmore_kill <= 0))
   {
     // see if TTS files have just become available
     if (tts.Poised() > 0)

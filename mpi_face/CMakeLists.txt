@@ -78,16 +78,3 @@ target_link_libraries(mpi_face
   pthread
 )
 
-# Make shared library (TTS only) --------------------------
-
-add_library(mpi_spout SHARED
-  src/mpi_spout.cpp
-  src/jhcFestTTS.cpp
-)
-
-# Required input libraries for shared lib
-target_link_libraries(mpi_spout
-  pthread
-)
-
-

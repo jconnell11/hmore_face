@@ -35,6 +35,7 @@ lib.face_gaze.argtypes = [c_float, c_float, c_float]
 
 
 # Python wrapper for animated face and TTS on MasterPi robot
+# needs: sudo apt install festival festival-dev soundstretch
 
 class MpiFace:
 

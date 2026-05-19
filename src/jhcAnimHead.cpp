@@ -96,6 +96,7 @@ jhcAnimHead::jhcAnimHead (const std::string& mdir, QWidget *parent) : QWidget(pa
 
 jhcAnimHead::~jhcAnimHead ()
 {
+  timer->stop();
   delete timer;
   Ogre::WindowEventUtilities::removeWindowEventListener(win, this);
   windowClosed(win);
