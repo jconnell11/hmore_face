@@ -3,11 +3,11 @@
 
 This a simple ROS animated head that can lip sync TTS messages, display a range of expressions, and gaze in various directions. Click the image below for a __video__ of the [Wansui](https://github.com/jconnell11/Wansui) robot using the system:
 
-[![Example video](images/Benny.jpg)](https://youtu.be/DcIPQSiz_0I)
+[![Example video](Benny.jpg)](https://youtu.be/DcIPQSiz_0I)
 
 The system is based on the old Homer Robot Face from the Universitaet Koblenz-Landau (see [this](https://gitlab.uni-koblenz.de/robbie/homer_robot_face/) and [this](https://github.com/homer-robotics/homer_robot_face)) and uses the same Ogre meshes. Yet it offers more than the original Homer. It uses an offline (embedded) TTS engine with tunable voice characteristics. It allows degrees of emotion and blending between certain base expressions. Finally, it can reorient the graphical head to indicate a rough gaze direction. 
 
-![Talking](images/talking2.jpg) ![Angry & Digusted](images/emo270_2.jpg) ![Gaze Left & Up](images/uplf0_2.jpg)
+![Talking](talking2.jpg) ![Angry & Digusted](emo270_2.jpg) ![Gaze Left & Up](uplf0_2.jpg)
 
 The code here is for Linux only (no Windows) and has been developed with Ubuntu 18.04 and ROS Melodic. It is known to work with Ogre 1.9.0 and Qt 4.8.7 on a Jetson Nano (Cortex A57). To build then start up the system do:
 
@@ -15,7 +15,7 @@ The code here is for Linux only (no Windows) and has been developed with Ubuntu 
     catkin build hmore_face
     roslaunch hmore_face hmore_face.launch
 
-Some of its capabilities are exercised by this sample [__Python script__](scripts/hmore_test.py) (see starting instructions at bottom of file).
+Some of its capabilities are exercised by this sample [__Python script__](../project/scripts/hmore_test.py) (see starting instructions at bottom of file).
 
 ## Text-to-Speech
 
@@ -24,7 +24,7 @@ The ROS node subscribes to string __speak__ messages for use with the Festival T
     rostopic pub -1 speak std_msgs/String "What's new dude?"
     rostopic pub -1 speak std_msgs/String "The red object is near the tall green thing"
 
-To allow for different voices, the fundamental frequency can be set (around 100 for male, 250 for female, 350 for kid). To avoid sounding like a creepy adult imitating a child, the overall vocal tract formants can be raised (like by 150%). And to aid intelligibility, the speech can be slowed down and given more or less inflection (sing-song quality). Some values from the YAML configuration file [hmore_face.yaml](config/hmore_face.yaml) are:
+To allow for different voices, the fundamental frequency can be set (around 100 for male, 250 for female, 350 for kid). To avoid sounding like a creepy adult imitating a child, the overall vocal tract formants can be raised (like by 150%). And to aid intelligibility, the speech can be slowed down and given more or less inflection (sing-song quality). Some values from the YAML configuration file [hmore_face.yaml](../project/config/hmore_face.yaml) are:
 
     voice_freq  : 270            # female fundamental
     voice_infl  : 30             # excited inflection
@@ -34,7 +34,7 @@ To allow for different voices, the fundamental frequency can be set (around 100 
 
 ## Basic Appearance
 
-The system was designed to use a dedicated display. The animation always appears against a full screen black backdrop, but its active size can be adjusted. As with the original Homer, the face style, skin color, eye color, and feature colors can be adjusted. Again, these are controlled by the ROS parameter file [hmore_face.yaml](config/hmore_face.yaml):
+The system was designed to use a dedicated display. The animation always appears against a full screen black backdrop, but its active size can be adjusted. As with the original Homer, the face style, skin color, eye color, and feature colors can be adjusted. Again, these are controlled by the ROS parameter file [hmore_face.yaml](../project/config/hmore_face.yaml):
 
     face_width  : 800            # pixel dimensions
     face_height : 600
@@ -100,8 +100,8 @@ With "mood" messages you are limited to just these 8 factors, as opposed to the 
 
 ## Non-ROS Library
 
-The code in the main repository is all for creating a ROS node. However, you can also compile the system as a simple __static library__ with the [mpi_face](mpi_face) subdirectory. All the basic messages described here are available as simple functions calls (see [mpi_face.cpp](mpi_face/src/mpi_face.cpp)). There is also a Python stub file [mpi_face.py](mpi_face/mpi_face.py) for integration or testing. Note that this code needs to be able to find the contents of the "mesh" subdirectory via the Start() function. And, if you just like the funky voice, there is the [mpi_spout](mpi_face/src/mpi_spout.cpp) library with __TTS only__ (no face) functionality.
+The code in the main repository is all for creating a ROS node. However, you can also compile the system as a simple __static library__ with the [mpi_face](../project/mpi_face) subdirectory. All the basic messages described here are available as simple functions calls (see [mpi_face.cpp](../project/mpi_face/src/mpi_face.cpp)). There is also a Python stub file [mpi_face.py](../project/mpi_face/mpi_face.py) for integration or testing. Note that this code needs to be able to find the contents of the "mesh" subdirectory via the Start() function. And, if you just like the funky voice, there is the [mpi_spout](../project/mpi_face/src/mpi_spout.cpp) library with __TTS only__ (no face) functionality.
 
 ---
 
-December 2025 - Jonathan Connell - jconnell@alum.mit.edu
+June 2026 - Jonathan Connell - jconnell@alum.mit.edu
